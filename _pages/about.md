@@ -2,19 +2,21 @@
 layout: about
 title: about
 permalink: /
-subtitle: <h3>Computer Science student @ Nottingham</h3>
+subtitle: Computer Science Student @ Nottingham
 
 profile:
   align: right
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>Currently in: KL, Malaysia</p>
+    <p>Currently In: </p>
+    <p>KL, Malaysia</p>
+    <p>Your City, State 12345</p>
 
-news: false # includes a list of news items
-selected_papers: false # includes a list of papers marked as "selected={true}"
+news: true # includes a list of news items
 social: true # includes social icons at the bottom of the page
 ---
+
 
 I'm Mikhail; current CS student at The University of Nottingham and aviation geek (also a big computer nerd).
 
