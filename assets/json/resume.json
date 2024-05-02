@@ -9,13 +9,13 @@
   },
   "work": [
     {
-      "name": "Institute for Advanced Study, Princeton University",
-      "position": "Professor of Theoretical Physics",
-      "url": "https://example.com",
-      "startDate": "1933-01-01",
-      "endDate": "1955-01-01",
-      "summary": "Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.",
-      "highlights": ["Relativity"]
+      "name": "The University of Nottingham",
+      "position": "Research Intern",
+      "url": "https://www.nottingham.ac.uk",
+      "startDate": "2024-06-01",
+      "endDate": "2024-09-01",
+      "summary": "Guided research and production of vector database search web app tool",
+      "highlights": ["Embeddings", "Vector Databases"]
     }
   ],
   "volunteer": [
@@ -37,10 +37,21 @@
       "url": "https://newtonschools.sch.qa/schools/nia-barwa-city/",
       "area": "IAL",
       "studyType": "O-Level and A-Levels",
-      "startDate": "2018-08-01",
+      "startDate": "2018-09-01",
       "endDate": "2022-06-01",
       "score": "1A* 2A",
       "courses": ["CS, Math, Physics"]
+    },
+    {
+      "institution": "The University of Nottingham",
+      "location": "Selangor, Malaysia",
+      "url": "https://www.nottingham.ac.uk",
+      "area": "Undergraduate",
+      "studyType": "BSc Computer Science",
+      "startDate": "2023-09-01",
+      "endDate": "2026-06-01",
+      "score": "",
+      "courses": ["CS, AI, Maths"]
     }
   ],
   "awards": [
@@ -121,42 +132,75 @@
   ],
   "skills": [
     {
-      "name": "Physics",
-      "level": "Master",
+      "name": "Programming & Other Computer Languages",
       "icon": "fa-solid fa-hashtag",
       "keywords": [
-        "Quantum Mechanics",
-        "Quantum Computing",
-        "Quantum Information",
-        "Quantum Cryptography",
-        "Quantum Communication",
-        "Quantum Teleportation"
+        "C",
+        "Python",
+        "Java",
+        "Bash",
+        "SQL",
+        "HTML+CSS",
+        "ARM7 Assembly"
+      ]
+    },
+    {
+      "name": "Frameworks, Libraries, Engines & Databases",
+      "icon": "fa-solid fa-hashtag",
+      "keywords": [
+        "PHP",
+        "Maven",
+        "LibGDX",
+        "Jupyter",
+        "MySQL",
+        "WeaviateDB"
+      ]
+    },
+    {
+      "name": "Development Tools & Environments",
+      "icon": "fa-solid fa-hashtag",
+      "keywords": [
+        "Git",
+        "Github",
+        "Linux",
+        "Windows",
+        "MacOS",
+        "Jupyter Notebooks"
       ]
     }
   ],
   "languages": [
     {
-      "language": "German",
+      "language": "English",
       "fluency": "Native speaker",
       "icon": ""
     },
     {
-      "language": "English",
+      "language": "Malay",
       "fluency": "Fluent",
       "icon": ""
     }
   ],
   "interests": [
     {
-      "name": "Physics",
+      "name": "Tech",
       "icon": "fa-solid fa-tag",
       "keywords": [
-        "Quantum Mechanics",
-        "Quantum Computing",
-        "Quantum Information",
-        "Quantum Cryptography",
-        "Quantum Communication",
-        "Quantum Teleportation"
+        "Software Development",
+        "Artificial Intelligence and Machine Learning",
+        "API Programming",
+        "PC Building",
+        "Latest Hardware Development"
+      ]
+    },
+    {
+      "name": "Hobbies",
+      "icon": "fa-solid fa-tag",
+      "keywords": [
+        "Language Learning (Japanese, Arabic, French)",
+        "Aviation and Flight Simulation",
+        "Reading (Sci-fi)",
+        "Gaming"
       ]
     }
   ],
