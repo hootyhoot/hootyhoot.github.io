@@ -218,12 +218,28 @@
   ],
   "projects": [
     {
-      "name": "Quantum Computing",
-      "summary": "Quantum computing is the use of quantum-mechanical phenomena such as superposition and entanglement to perform computation. Computers that perform quantum computations are known as quantum computers.",
-      "highlights": ["Quantum Teleportation", "Quantum Cryptography"],
-      "startDate": "2018-01-01",
-      "endDate": "2018-01-01",
-      "url": "https://example.com"
+      "name": "SpeedRead",
+      "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
+      "highlights": ["Desktop App Development", "Maven"],
+      "startDate": "2023-05-01",
+      "endDate": "2023-06-01",
+      "url": "https://github.com/hootyhoot/SpeedRead"
+    },
+    {
+      "name": "METARBot",
+      "summary": "Developed a Discord bot to fetch METAR (Weather reports used in aviation) for flight simulation purposes which has been used in over 10+ large flight sim servers",
+      "highlights": ["Discord API", "checkWX API"],
+      "startDate": "2022-06-01",
+      "endDate": "2022-06-02",
+      "url": "https://github.com/hootyhoot/METARbot"
+    },
+    {
+      "name": "keyword-bot",
+      "summary": "Developed a simple Discord bot to detect usage of keywords and respond based on sentiment (bad word or good word)",
+      "highlights": ["Discord API"],
+      "startDate": "2022-05-01",
+      "endDate": "2022-05-02",
+      "url": "https://github.com/hootyhoot/keyword-bot"
     }
   ]
 }
