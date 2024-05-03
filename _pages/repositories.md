@@ -7,7 +7,7 @@ nav: true
 nav_order: 4
 ---
 
-## GitHub users
+## stats
 
 {% if site.data.repositories.github_users %}
 
@@ -35,7 +35,7 @@ nav_order: 4
 {% endif %}
 {% endif %}
 
-## GitHub Repositories
+## pinned repos
 
 {% if site.data.repositories.github_repos %}
 
