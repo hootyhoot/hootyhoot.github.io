@@ -11,7 +11,6 @@ profile:
   more_info: >
     <p>Currently In: </p>
     <p>KL, Malaysia</p>
-    <p>Your City, State 12345</p>
 
 news: true # includes a list of news items
 social: true # includes social icons at the bottom of the page
