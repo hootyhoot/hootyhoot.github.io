@@ -17,6 +17,6 @@ social: true # includes social icons at the bottom of the page
 ---
 
 
-I'm Mikhail; current CS student at The University of Nottingham and aviation geek (also a big computer nerd).
+I'm Mikhail; a CS student at The University of Nottingham and aviation geek (also a big computer nerd).
 
 I am always looking for new challenges: whether it's hackathons, making personal projects, or contributing to open-source! :D
