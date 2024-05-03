@@ -447,9 +447,12 @@ footer.fixed-bottom {
 
 footer.sticky-bottom {
   border-top: 1px solid var(--global-divider-color);
-  padding-top: 40px;
-  padding-bottom: 40px;
+  padding-top: 12px;
+  padding-bottom: 12px;
   font-size: 0.9rem;
+
+  bottom: 0;
+  width: 100%;
 
   .container {
     text-align: center;
