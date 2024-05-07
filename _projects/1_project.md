@@ -10,7 +10,7 @@ related_publications: false
 
 This is a base on which I will build my Book recommendation web app.
 
-Using the replicate API and using the stable diffusion XL model for simple image generation in a Node.js app hosted by Vercel. The site can be accessed <a href="https://sdxl-mikhail-codes.vercel.app">here</a>
+Using the replicate API and using the stable diffusion XL model for simple image generation in a Next.js app hosted by Vercel. The site can be accessed <a href="https://sdxl-mikhail-codes.vercel.app">here</a>
 
 More info on the implementation at the bottom.
 
@@ -30,12 +30,23 @@ These are some of my favorite generations produced by SDXL, on the left an I pro
         {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
+<div class="caption">
+    This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
+</div>
 
-This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
-
-
+---
 The code itself is simple and can be found <a href="https://github.com/hootyhoot/replicate-sdxl">here</a>.
 But this all wasn't just for me to learn JS but rather the replicate API and hosting on Vercel.
+
+First we initialise a Next.js app using:
+{% raw %}
+
+```bash
+npx create-next-app@latest
+```
+
+{% endraw %}
+Then we can layout the page by editing the pages.js.
 
 For the replicate call itself:
 
