@@ -1,81 +1,96 @@
 ---
 layout: page
-title: project 1
-description: with background image
-img: assets/img/12.jpg
+title: stable diffusion study
+description: a study in replicate api and vercel deployments
+img: assets/img/sdxl.jpg
 importance: 1
-category: work
-related_publications: true
+category: personal
+related_publications: false
 ---
 
-Every project has a beautiful feature showcase page.
-It's easy to include images in a flexible 3-column grid format.
-Make your photos 1/3, 2/3, or full width.
+This is a base on which I will build my Book recommendation web app.
 
-To give your project a background in the portfolio page, just add the img tag to the front matter like so:
+Using the replicate API and using the stable diffusion XL model for simple image generation in a Node.js app hosted by Vercel. The site can be accessed <a href="https://sdxl-mikhail-codes.vercel.app">here</a>
 
-    ---
-    layout: page
-    title: project
-    description: a project with a background image
-    img: /assets/img/12.jpg
-    ---
+More info on the implementation at the bottom.
 
 <div class="row">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/1.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl2.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/3.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl3.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
-    Caption photos easily. On the left, a road goes through a tunnel. Middle, leaves artistically fall in a hipster photoshoot. Right, in another hipster photoshoot, a lumberjack grasps a handful of pine needles.
-</div>
+
+These are some of my favorite generations produced by SDXL, on the left an I prompted it to create a sample image but instead it spit out a beautifully vibrant and abstract line art. On the right, I prompted "top down drone view of a future city in Bladerunner style".
+
 <div class="row">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
-    This image can also have a caption. It's like magic.
-</div>
 
-You can also put regular text between your rows of images, even citations {% cite einstein1950meaning %}.
-Say you wanted to write a bit about your project before you posted the rest of the images.
-You describe how you toiled, sweated, _bled_ for your project, and then... you reveal its glory in the next row of images.
+This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
 
-<div class="row justify-content-sm-center">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    You can also have artistically styled 2/3 + 1/3 images, like these.
-</div>
 
-The code is simple.
-Just wrap your images with `<div class="col-sm">` and place them inside `<div class="row">` (read more about the <a href="https://getbootstrap.com/docs/4.4/layout/grid/">Bootstrap Grid</a> system).
-To make images responsive, add `img-fluid` class to each; for rounded corners and shadows use `rounded` and `z-depth-1` classes.
-Here's the code for the last row of images above:
+The code itself is simple and can be found <a href="https://github.com/hootyhoot/replicate-sdxl">here</a>.
+But this all wasn't just for me to learn JS but rather the replicate API and hosting on Vercel.
+
+For the replicate call itself:
 
 {% raw %}
 
-```html
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm-4 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
+```js
+
+import Replicate from "replicate";
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
+
+//the rest of the JS
+
+const output = await replicate.run(
+  "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+  {
+    input: {
+      prompt: "top down drone view of a future city in Bladerunner style"
+    }
+  }
+);
+
+//then the error handling for the response
 ```
 
 {% endraw %}
+
+Then we can push to Github and deploy on vercel. For that we have to do the following:
+
+We first install Vercel using npx:
+{% raw %}
+
+```bash
+npx vercel
+```
+
+{% endraw %}
+
+Then we can set our environment variables/secrets using the below (allegedly, but I had troubles for the app to see my replicate token as it kept printing no token found. Instead I manually set it in the Vercel website under environment variables)
+{% raw %}
+
+```bash
+vercel env add REPLICATE_API_TOKEN
+```
+
+{% endraw %}
+
+And finally, we can deploy using: (I used all the default deployment settings except to not use tailwind CSS)
+{% raw %}
+
+```bash
+npx vercel deploy --prod
+```
+
+{% endraw %}
+
+Optionally you can also set a custom domain in the vercel dashboard.
