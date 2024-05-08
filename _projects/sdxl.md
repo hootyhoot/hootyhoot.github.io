@@ -8,22 +8,30 @@ category: personal
 related_publications: false
 ---
 
-This is a base on which I will build my Book recommendation web app.
+With this project I am hoping to build a foundation of knowledge to later create my book recommendation app. Moving forward, I will also be using this to generate the images used on this site.
 
-Using the replicate API and using the stable diffusion XL model for simple image generation in a Next.js app hosted by Vercel. The site can be accessed <a href="https://sdxl-mikhail-codes.vercel.app">here</a>
+Using the replicate API and using the Stable Diffusion XL model for simple image generation in a Next.js app hosted by Vercel. The site can be accessed <a href="https://sdxl-mikhail-codes.vercel.app">here</a>
 
 More info on the implementation at the bottom.
+
+---
+
+Here are a few samples of the images that SDXL generated, all of these were generated on an Nvidia A40L with about 10s runtime for each. 
 
 <div class="row">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl2.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
+        <div class="caption">
+            I prompted it to create a sample image but instead it spit out a beautifully vibrant and abstract line art.
+        </div>
     </div>
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl3.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
+        <div class="caption">
+            "top down drone shot of a future city in bladerunner style"
+        </div>
     </div>
 </div>
-
-These are some of my favorite generations produced by SDXL, on the left an I prompted it to create a sample image but instead it spit out a beautifully vibrant and abstract line art. On the right, I prompted "top down drone view of a future city in Bladerunner style".
 
 <div class="row">
     <div class="col-sm mt-3 mt-md-0">
