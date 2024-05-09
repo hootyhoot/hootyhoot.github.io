@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://hootyhoot.github.io/sitemap.xml
+Sitemap: https://mikhail.codes/sitemap.xml
