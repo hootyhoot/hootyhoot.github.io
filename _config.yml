@@ -8,10 +8,10 @@ middle_name:
 last_name: Armanuel
 email: mail@mikhail.codes
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  Mikhail's Portfolio Site
+  Mikhail Armanuel - Computer science student trying to document their journey. Explore my portfolio of projects, repositories and my CV. Let's collaborate!
 footer_text: >
   
-keywords: academic-website, portfolio-website, computer-science, software-developer # add your own keywords or leave empty
+keywords: academic-website, portfolio-website, computer-science, nottingham, nottingham-university, cv, UNM, Web-Development, Mobile-App-Development, Data-Structures, Algorithms, Object-Oriented-Programming, Java, Python, C++, JavaScript, React, Angular, Node.js, Machine-Learning, Artificial-Intelligence, Data-Analysis,D atabase-Management, SQL, NoSQL, Cloud-Computing, DevOps, Agile-Methodology, Git, GitHub, Open-Source, Hackathons, Coding-Projects, Portfolio, Computer-Science-Student,kuala-lumpur-Computer-Science, malaysia-computer-science, nottingham-Computer-Science, malaysia-student # add your own keywords or leave empty
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: "favicon.png" # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 
