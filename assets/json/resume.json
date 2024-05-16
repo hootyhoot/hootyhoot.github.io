@@ -214,15 +214,15 @@
     {
       "name": "SpeedRead",
       "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
-      "highlights": ["Desktop App Development", "Maven"],
+      "highlights": ["Desktop App Development", "Maven", "Java"],
       "startDate": "2023-05-01",
       "endDate": "2023-06-01",
       "url": "https://github.com/hootyhoot/SpeedRead"
     },
     {
       "name": "METARBot",
-      "summary": "Developed a Discord bot to fetch METAR (Weather reports used in aviation) for flight simulation purposes which has been used in over 10+ large flight sim servers",
-      "highlights": ["Discord API", "checkWX API"],
+      "summary": "Developed a Discord bot privately hosted inside a docker container to fetch METARs (Weather reports used in aviation) for flight simulation purposes which has been used in over 75 flight sim servers",
+      "highlights": ["Discord API", "Python", "Flask", "Docker"],
       "startDate": "2022-06-01",
       "endDate": "2022-06-02",
       "url": "https://github.com/hootyhoot/METARbot"
