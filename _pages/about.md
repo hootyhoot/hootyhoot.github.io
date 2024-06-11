@@ -10,7 +10,7 @@ profile:
   image_circular: false # crops the image to make it circular
   more_info: >
     <p>Currently In: </p>
-    <p>KL, Malaysia</p>
+    <p>KL 🇲🇾</p>
 
 news: true # includes a list of news items
 social: true # includes social icons at the bottom of the page
