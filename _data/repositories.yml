@@ -2,7 +2,7 @@ github_users:
   - hootyhoot
 
 github_repos:
+  - hootyhoot/book-recommender
   - hootyhoot/SpeedRead
   - hootyhoot/METARbot
   - hootyhoot/keyword-bot
-  - hootyhoot/book-recommender
