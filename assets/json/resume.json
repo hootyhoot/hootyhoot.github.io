@@ -14,8 +14,11 @@
       "url": "https://www.nottingham.ac.uk",
       "startDate": "2024-06-01",
       "endDate": "2024-09-01",
-      "summary": "Guided research and production of vector database search web app tool",
-      "highlights": ["Embeddings", "Vector Databases"]
+      "summary": "Guided research and production of vector database search web app tool (https://books.mikhail.codes))",
+      "highlights": [
+        "Embeddings",
+        "Vector Databases"
+      ]
     }
   ],
   "volunteer": [
@@ -27,7 +30,10 @@
       "startDate": "2014-04-01",
       "endDate": "2015-07-01",
       "summary": "Lead organizer for the New York City branch of the People's Climate March, the largest climate march in history.",
-      "highlights": ["Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march.", "Men of the year 2014 by Time magazine"]
+      "highlights": [
+        "Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march.",
+        "Men of the year 2014 by Time magazine"
+      ]
     }
   ],
   "education": [
@@ -39,7 +45,9 @@
       "studyType": "A-Levels",
       "startDate": "2020-09-01",
       "endDate": "2022-06-01",
-      "courses": ["Final Grade: 1A*/2A"]
+      "courses": [
+        "Final Grade: 1A*/2A"
+      ]
     },
     {
       "institution": "The University of Nottingham",
@@ -49,7 +57,9 @@
       "studyType": "BSc Computer Science",
       "startDate": "2023-09-01",
       "endDate": "2026-06-01",
-      "courses": ["Ongoing"]
+      "courses": [
+        "Ongoing"
+      ]
     }
   ],
   "awards": [
@@ -156,7 +166,11 @@
     {
       "name": "SpeedRead",
       "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
-      "highlights": ["Desktop App Development", "Maven", "Java"],
+      "highlights": [
+        "Desktop App Development",
+        "Maven",
+        "Java"
+      ],
       "startDate": "2023-05-01",
       "endDate": "2023-06-01",
       "url": "https://github.com/hootyhoot/SpeedRead"
@@ -164,7 +178,12 @@
     {
       "name": "METARBot",
       "summary": "Developed a Discord bot privately hosted inside a docker container to fetch METARs (Weather reports used in aviation) for flight simulation purposes which has been used in over 75 flight sim servers",
-      "highlights": ["Discord API", "Python", "Flask", "Docker"],
+      "highlights": [
+        "Discord API",
+        "Python",
+        "Flask",
+        "Docker"
+      ],
       "startDate": "2022-06-01",
       "endDate": "2022-06-02",
       "url": "https://github.com/hootyhoot/METARbot"
@@ -172,7 +191,9 @@
     {
       "name": "keyword-bot",
       "summary": "Developed a simple Discord bot to detect usage of keywords and respond based on sentiment (bad word or good word)",
-      "highlights": ["Discord API"],
+      "highlights": [
+        "Discord API"
+      ],
       "startDate": "2022-05-01",
       "endDate": "2022-05-02",
       "url": "https://github.com/hootyhoot/keyword-bot"
