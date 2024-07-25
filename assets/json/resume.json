@@ -1,5 +1,5 @@
 {
-  "basics": {
+  "about": {
     "name": "Mikhail Armanuel",
     "title": "Undergraduate Student",
     "image": "",
@@ -14,7 +14,7 @@
       "url": "https://www.nottingham.ac.uk",
       "startDate": "2024-06-01",
       "endDate": "2024-09-01",
-      "summary": "Guided research and production of vector database search web app tool (https://books.mikhail.codes))",
+      "summary": "Guided research and production of vector database search web app tool",
       "highlights": [
         "Embeddings",
         "Vector Databases"
@@ -99,10 +99,10 @@
       "name": "Frameworks, Libraries, Engines & Databases",
       "icon": "fa-solid fa-hashtag",
       "keywords": [
+        "Flask",
         "PHP",
         "Maven",
         "LibGDX",
-        "Jupyter",
         "MySQL",
         "WeaviateDB"
       ]
@@ -163,6 +163,20 @@
     }
   ],
   "projects": [
+    {
+      "name": "Book Recommender",
+      "summary": "Developed a web app tool for searching books based on embeddings and vector databases.",
+      "highlights": [
+        "Embeddings",
+        "OpenAI API",
+        "ISBNdb API",
+        "Python",
+        "Flask"
+      ],
+      "startDate": "2024-06-15",
+      "endDate": "2024-09-10",
+      "url": "https://github.com/hootyhoot/book-recommender"
+    },
     {
       "name": "SpeedRead",
       "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
