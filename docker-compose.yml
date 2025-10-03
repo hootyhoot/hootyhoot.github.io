@@ -3,11 +3,29 @@ version: "3"
 services:
   jekyll:
     image: amirpourmand/al-folio:latest
-    build: .
+    # build: . # Removed as we are using a pre-built image
     ports:
-      - 8080:8080
-      - 35729:35729
+      - "8080:8080" # Quoting port numbers is good practice
+      - "35729:35729"
     volumes:
+      # Mounts the current directory (where this docker-compose.yml and _config.yml are located)
+      # to /srv/jekyll inside the container.
       - .:/srv/jekyll
+      # Persist bundle installation across runs to speed up subsequent starts
+      # This creates a named volume 'mikhail_codes_bundle_cache'
+      - mikhail_codes_bundle_cache:/usr/local/bundle 
     environment:
       - JEKYLL_ENV=development
+    # Override the default command to first install gems, then explicitly remove _site, then serve.
+    # Common flags: --host 0.0.0.0 (to be accessible from outside the container)
+    #               --livereload (if port 35729 is for LiveReload)
+    #               --force_polling (can help with file watching in Docker)
+    #               --trace (for more detailed error output if issues arise)
+    command: >
+      sh -c "bundle install && 
+             rm -rf /srv/jekyll/_site && 
+             bundle exec jekyll serve --host 0.0.0.0 --port 8080 --livereload --force_polling --trace"
+
+# Define the named volume for the bundle cache
+volumes:
+  mikhail_codes_bundle_cache:

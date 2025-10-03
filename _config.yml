@@ -592,4 +592,4 @@ jsonresume:
   - skills
   - languages
   - interests
-  #- references
+  #- references #commenting out references
