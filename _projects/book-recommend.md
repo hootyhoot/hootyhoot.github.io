@@ -4,7 +4,7 @@ title: book recommend
 description: text embeddings based book recommendations
 img: assets/img/book-recommend.jpg
 importance: 1
-category: personal
+category: HIDDENpersonal
 related_publications: false
 ---
 
