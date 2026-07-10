@@ -10,7 +10,7 @@
     {
       "name": "WyseTime Technologies",
       "position": "Embedded Systems Engineer",
-      "location": "PFCC Puchong",
+      "location": "Puchong, Selangor, Malaysia",
       "startDate": "2026-07-01"
     },
     {
@@ -44,7 +44,9 @@
   "education": [
     {
       "institution": "Advanced Semiconductor Academy of Malaysia",
-      "studyType": "National Semiconductor Excellence Programme (AI Robotics)"
+      "studyType": "National Semiconductor Excellence Programme (AI Robotics)",
+      "startDate": "2026-06-01",
+      "endDate": "2026-10-01"
     },
     {
       "institution": "Newton International Academy",
