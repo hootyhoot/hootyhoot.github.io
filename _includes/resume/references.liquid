@@ -24,6 +24,14 @@
               <b>{{ content.reference }}</b>
             </td>
           </tr>
+          {% if content.email %}
+            <tr>
+              <td></td>
+              <td class="list-group-name">
+                <a href="mailto:{{ content.email }}">{{ content.email }}</a>
+              </td>
+            </tr>
+          {% endif %}
         </tbody>
       </table>
     </div>

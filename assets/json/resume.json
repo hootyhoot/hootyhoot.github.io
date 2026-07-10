@@ -159,7 +159,14 @@
     {
       "name": "Prof. Tissa Chandesa PhD.",
       "icon": "fa-solid fa-thumbtack",
-      "reference": "University of Nottingham, Malaysia"
+      "reference": "University of Nottingham",
+      "email": "Tissa.Chandesa@nottingham.edu.my"
+    },
+    {
+      "name": "Prof. Kweh Yeah Lun PhD.",
+      "icon": "fa-solid fa-thumbtack",
+      "reference": "University of Nottingham",
+      "email": "Kweh.YeahLun@nottingham.edu.my"
     }
   ],
   "projects": [
