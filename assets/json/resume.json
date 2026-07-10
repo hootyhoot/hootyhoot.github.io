@@ -1,13 +1,18 @@
 {
   "about": {
     "name": "Mikhail Armanuel",
-    "title": "Undergraduate Student",
+    "title": "Embedded Systems Engineer",
     "image": "",
     "email": "mail@mikhail.codes",
-    "phone": "+60 14 344 3705",
-    "currently": "3rd year student @ UNM"
+    "currently": "working at WyseTime Technologies"
   },
   "work": [
+    {
+      "name": "WyseTime Technologies",
+      "position": "Embedded Systems Engineer",
+      "location": "PFCC Puchong",
+      "startDate": "2026-07-01"
+    },
     {
       "name": "The University of Nottingham",
       "position": "Research Intern",
@@ -37,6 +42,10 @@
     }
   ],
   "education": [
+    {
+      "institution": "Advanced Semiconductor Academy of Malaysia",
+      "studyType": "National Semiconductor Excellence Programme (AI Robotics)"
+    },
     {
       "institution": "Newton International Academy",
       "location": "Doha, Qatar",
