@@ -71,6 +71,57 @@
       ]
     }
   ],
+  "projects": [
+    {
+      "name": "Book Recommender",
+      "summary": "Developed a web app tool for searching books based on embeddings and vector databases.",
+      "highlights": [
+        "Embeddings",
+        "OpenAI API",
+        "ISBNdb API",
+        "Python",
+        "Flask"
+      ],
+      "startDate": "2024-06-15",
+      "endDate": "2024-09-10",
+      "url": "https://github.com/hootyhoot/book-recommender"
+    },
+    {
+      "name": "SpeedRead",
+      "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
+      "highlights": [
+        "Desktop App Development",
+        "Maven",
+        "Java"
+      ],
+      "startDate": "2023-05-01",
+      "endDate": "2023-06-01",
+      "url": "https://github.com/hootyhoot/SpeedRead"
+    },
+    {
+      "name": "METARBot",
+      "summary": "Developed a Discord bot privately hosted inside a docker container to fetch METARs (Weather reports used in aviation) for flight simulation purposes which has been used in over 75 flight sim servers",
+      "highlights": [
+        "Discord API",
+        "Python",
+        "Flask",
+        "Docker"
+      ],
+      "startDate": "2022-06-01",
+      "endDate": "2022-06-02",
+      "url": "https://github.com/hootyhoot/METARbot"
+    },
+    {
+      "name": "keyword-bot",
+      "summary": "Developed a simple Discord bot to detect usage of keywords and respond based on sentiment (bad word or good word)",
+      "highlights": [
+        "Discord API"
+      ],
+      "startDate": "2022-05-01",
+      "endDate": "2022-05-02",
+      "url": "https://github.com/hootyhoot/keyword-bot"
+    }
+  ],
   "awards": [
     {
       "title": "Nobel Prize in Physics",
@@ -176,57 +227,6 @@
       "icon": "fa-solid fa-thumbtack",
       "reference": "University of Nottingham",
       "email": "Kweh.YeahLun@nottingham.edu.my"
-    }
-  ],
-  "projects": [
-    {
-      "name": "Book Recommender",
-      "summary": "Developed a web app tool for searching books based on embeddings and vector databases.",
-      "highlights": [
-        "Embeddings",
-        "OpenAI API",
-        "ISBNdb API",
-        "Python",
-        "Flask"
-      ],
-      "startDate": "2024-06-15",
-      "endDate": "2024-09-10",
-      "url": "https://github.com/hootyhoot/book-recommender"
-    },
-    {
-      "name": "SpeedRead",
-      "summary": "Developed a Java application for speed reading PDF documents using Apache PDFBox library and Maven build automation tool.",
-      "highlights": [
-        "Desktop App Development",
-        "Maven",
-        "Java"
-      ],
-      "startDate": "2023-05-01",
-      "endDate": "2023-06-01",
-      "url": "https://github.com/hootyhoot/SpeedRead"
-    },
-    {
-      "name": "METARBot",
-      "summary": "Developed a Discord bot privately hosted inside a docker container to fetch METARs (Weather reports used in aviation) for flight simulation purposes which has been used in over 75 flight sim servers",
-      "highlights": [
-        "Discord API",
-        "Python",
-        "Flask",
-        "Docker"
-      ],
-      "startDate": "2022-06-01",
-      "endDate": "2022-06-02",
-      "url": "https://github.com/hootyhoot/METARbot"
-    },
-    {
-      "name": "keyword-bot",
-      "summary": "Developed a simple Discord bot to detect usage of keywords and respond based on sentiment (bad word or good word)",
-      "highlights": [
-        "Discord API"
-      ],
-      "startDate": "2022-05-01",
-      "endDate": "2022-05-02",
-      "url": "https://github.com/hootyhoot/keyword-bot"
     }
   ]
 }
