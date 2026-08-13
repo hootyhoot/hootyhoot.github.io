@@ -53,23 +53,23 @@ This command runs the container in a detached mode which runs in the background,
 ---
 Now let's demo the bot!
 
-<div class="row">
+<div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/dockerising1.png" title="metar bot trial for KLIA airport" class="img-fluid rounded z-depth-1" %}
-        <div class="caption">
+        <div class="figure-caption">
             What's the weather like in KLIA maybe?
         </div>
     </div>
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/dockerising2.png" title="metar bot trial for Changi airport" class="img-fluid rounded z-depth-1" %}
-        <div class="caption">
+        <div class="figure-caption">
             How about Singapore Changi?
         </div>
     </div>
 </div>
 
-<div class="caption">
-    <h1>🤔🤔🤔</h1>
+<div class="beat">
+    <p class="beat-emoji">🤔🤔🤔</p>
     <h4>But what do the numbers mean?!</h4>
 </div>
 

@@ -2,7 +2,7 @@ name: Check for broken links on site
 
 on:
   workflow_run:
-    workflows: [Deploy site]
+    workflows: ["Deploy Jekyll site to Pages"]
     types: [completed]
 
 jobs:
@@ -17,27 +17,12 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2.2"
+          ruby-version: "3.2"
           bundler-cache: true
-      - name: Update _config.yml ⚙️
-        uses: fjogeleit/yaml-update-action@main
-        with:
-          commitChange: false
-          valueFile: "_config.yml"
-          changes: |
-            {
-              "giscus.repo": "${{ github.repository }}",
-              "baseurl": ""
-            }
-      - name: Install and Build 🔧
-        run: |
-          pip3 install --upgrade jupyter
-          export JEKYLL_ENV=production
-          bundle exec jekyll build --lsi
-      - name: Purge unused CSS 🧹
-        run: |
-          npm install -g purgecss
-          purgecss -c purgecss.config.js
+      - name: Build 🔧
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
       - name: Link Checker 🔗
         uses: lycheeverse/lychee-action@v1.9.0
         with:

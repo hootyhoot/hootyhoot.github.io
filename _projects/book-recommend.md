@@ -5,7 +5,6 @@ description: text embeddings based book recommendations
 img: assets/img/book-recommend.jpg
 importance: 1
 category: HIDDENpersonal
-related_publications: false
 ---
 
 On the summer break after my first year I decided to take a research internship under the university so that I wasn't rotting in bed for 3 months. My task was simple, find something that interested me, then research and implement that idea.
@@ -41,12 +40,12 @@ Embeddings were also practically free from OpenAI with the <em>text-embedding-3-
 The code itself was relatively simple
 
 
-<div class="row">
+<div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
+<div class="figure-caption">
     This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
 </div>
 

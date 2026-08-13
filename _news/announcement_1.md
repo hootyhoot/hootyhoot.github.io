@@ -1,8 +1,7 @@
 ---
-layout: post
+layout: page
 date: 2022-7-01 15:59:00-0400
 inline: true
-related_posts: false
 ---
 
 Graduated High School!

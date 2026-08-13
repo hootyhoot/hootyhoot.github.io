@@ -5,7 +5,6 @@ description: building a computer from the ground up
 img: assets/img/nand2tetris.jpeg
 importance: 2
 category: school
-giscus_comments: false
 ---
 Maybe my favorite module during the first year was "Computer Fundamentals". We used the popular nand2tetris course structure to "build a computer" starting from the most basic gates to a fully functioning computer (if you can call a calculator a fully functioning computer).
 
@@ -25,7 +24,7 @@ ourChip(input1=a, input2=b, result=innerOutput);
 Not(in=innerOutput, out=out);
 }
 ```
-<div class="caption">
+<div class="figure-caption">
     Here is what an And gate looked like
 </div>
 
@@ -50,12 +49,12 @@ Mux16(a=fxy, b=nfxy, sel=no, out=output);
 }
 ```
 
-<div class="row">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/nand2tetris1.jpg" title="ALU diagram" class="img-fluid rounded z-depth-1" %}
+<div class="figure-row figure-row--balanced" style="--ar-1: 1.368fr; --ar-2: 0.640fr;">
+    <div>
+        {% include figure.liquid loading="eager" path="assets/img/nand2tetris1.jpg" title="ALU diagram" %}
     </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/nand2tetris2.jpg" title="ALU diagram" class="img-fluid rounded z-depth-1" %}
+    <div>
+        {% include figure.liquid loading="eager" path="assets/img/nand2tetris2.jpg" title="ALU diagram" %}
     </div>
 </div>
 Basically, what the ALU does is that for any two 16 bit inputs, to output either the negation, addition, subtraction, conjunction, or disjunction of them. From the diagram above we can see that the ALU has 6 control bits, changing the values of these control bits according to the truth table will output the desired operation.
@@ -108,10 +107,10 @@ Et voila! There is our full fledged computer that can run assembly programs.
 
 Here we run a simple assembly program to add 2 and 3:
 
-<div class="row">
+<div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
         {% include video.liquid path="assets/video/nand2tetris.mp4" class="img-fluid rounded z-depth-1" autoplay=true loop=true controls=true%}
-        <div class="caption">
+        <div class="figure-caption">
             Note the end result in the D register and also RAM address 0.
         </div>
     </div>

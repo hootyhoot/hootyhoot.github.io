@@ -1,9 +1,8 @@
 ---
-layout: post
+layout: page
 title: Got my first internship!
 date: 2024-04-05 16:11:00-0400
 inline: false
-related_posts: false
 ---
 
 Research summer internship at The University of Nottingham

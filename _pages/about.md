@@ -2,21 +2,15 @@
 layout: about
 title: about
 permalink: /
-subtitle: Computer Science Student @ Nottingham
+subtitle: Embedded Systems Engineer @ WyseTime Technologies
 
 profile:
   align: right
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
-  more_info: >
-    <p>Currently In: </p>
-    <p>KL 🇲🇾</p>
 
 news: true # includes a list of news items
 social: true # includes social icons at the bottom of the page
 ---
 
-
-I'm Mikhail; a CS student at The University of Nottingham and aviation geek (also a big computer nerd).
-
-I am always looking for new challenges: whether it's hackathons, making personal projects, or contributing to open-source! :D
+Embedded systems engineer at WyseTime Technologies, based in Kuala Lumpur, Malaysia 🇲🇾. CS grad from The University of Nottingham and an aviation geek (also a big computer nerd) — always looking for new challenges, whether that's hackathons, personal projects, or contributing to open source.

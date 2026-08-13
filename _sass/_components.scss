@@ -1,0 +1,590 @@
+// -----------------------------------------------------------------------------
+// Components
+// -----------------------------------------------------------------------------
+
+// --- Hero / status strip --------------------------------------------------
+
+.hero {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  animation: hero-in 0.5s ease both;
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero-name {
+  margin-bottom: 0.15em;
+}
+
+.hero-title {
+  font-family: var(--font-mono);
+  color: var(--role-data);
+  font-size: 1.05rem;
+  margin-bottom: 1.4rem;
+}
+
+.hero-photo {
+  flex: 0 0 auto;
+  width: 200px;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  background: var(--surface);
+}
+
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 2px;
+}
+
+.status-strip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.status-strip-code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--role-active);
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.02em;
+  word-break: break-word;
+}
+
+.status-strip-decode,
+.bio {
+  max-width: 62ch;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.status-strip-decode p,
+.bio p {
+  margin: 0 0 1em;
+}
+
+.status-strip-decode p:last-child,
+.bio p:last-child {
+  margin-bottom: 0;
+}
+
+.bio {
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 620px) {
+  .hero {
+    flex-direction: column-reverse;
+  }
+  .hero-photo {
+    width: 140px;
+  }
+}
+
+// --- Section heading with link ---------------------------------------------
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.section-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.section-link:hover {
+  color: var(--role-data);
+}
+
+// --- Flight log (timeline: CV work/education + news) -----------------------
+
+.flight-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.log-entry {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.log-date {
+  flex: 0 0 5.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--role-data);
+  line-height: 1.4;
+  padding-top: 0.15rem;
+}
+
+.log-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.log-title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--ink);
+  margin: 0 0 0.2rem;
+  display: block;
+}
+
+a.log-title:hover {
+  color: var(--role-data);
+}
+
+.log-content p {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+.log-sub {
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.4rem;
+}
+
+.log-summary {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.5rem;
+}
+
+.flight-log--compact .log-entry {
+  align-items: baseline;
+  padding: 0.65rem 0;
+}
+
+.flight-log--compact .log-date {
+  padding-top: 0;
+}
+
+.flight-log--compact .log-content p {
+  margin: 0;
+}
+
+// --- Tags / pills ------------------------------------------------------
+
+.tag-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.5rem;
+  background: var(--surface);
+}
+
+.tag--category {
+  color: var(--role-highlight);
+  border-color: var(--role-highlight);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// --- Panels (CV sections, repo panels, 404) ---------------------------------
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  scroll-margin-top: 5rem;
+}
+
+.panel-title {
+  margin-bottom: 1rem;
+  color: var(--role-active);
+}
+
+.skill-group + .skill-group {
+  margin-top: 1.25rem;
+}
+
+.skill-group-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+
+// --- Reference / language lists ---------------------------------------------
+
+.reference-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .reference-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.reference-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  background: var(--surface-raised);
+}
+
+.reference-name {
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+}
+
+.reference-org {
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+  margin: 0 0 0.4rem;
+}
+
+.reference-email {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+// --- CV about / summary ------------------------------------------------
+
+.cv-basics dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.75rem;
+}
+
+.cv-basics dd {
+  margin: 0.15rem 0 0;
+}
+
+// --- Buttons / CTAs -------------------------------------------------------
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.8rem;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.btn:hover {
+  border-color: var(--role-data);
+  color: var(--role-data);
+  text-decoration: none;
+}
+
+.btn svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+// --- Social / contact channels ----------------------------------------------
+
+.social-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.social-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.social-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--ink);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.social-list a:hover {
+  color: var(--role-data);
+  border-color: var(--role-data);
+  text-decoration: none;
+}
+
+.social-list svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--role-data);
+}
+
+// --- Project cards ----------------------------------------------------------
+
+.category-heading {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--role-highlight);
+  margin: 2rem 0 1rem;
+}
+
+.category-heading:first-child {
+  margin-top: 0;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+  color: var(--ink);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.project-card:hover {
+  border-color: var(--role-data);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.project-card-img {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.project-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-card-body {
+  padding: 1rem 1.1rem 1.2rem;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.project-card-title {
+  margin: 0.2rem 0 0;
+  font-size: 1.1rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.project-card-desc {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+// --- Figures (project detail pages) -----------------------------------------
+
+figure {
+  margin: 1.5rem 0;
+}
+
+figure img,
+figure video {
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.figure-caption {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: center;
+  margin: 0.4rem 0 1.5rem;
+}
+
+.beat {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.beat-emoji {
+  font-size: 2.2rem;
+  margin: 0 0 0.3rem;
+}
+
+.beat h4 {
+  margin: 0;
+}
+
+.figure-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.875rem;
+}
+
+// Sizes columns proportional to each image's aspect ratio (set inline
+// per instance via --ar-1 / --ar-2) so the row fills the full content
+// width while both images end up the same rendered height — for pairing
+// images of very different aspect ratios (e.g. a wide diagram next to a
+// tall table) so neither one dwarfs the other.
+.figure-row--balanced {
+  display: grid;
+  grid-template-columns: var(--ar-1, 1fr) var(--ar-2, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.figure-row--balanced figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.figure-row--balanced img {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .figure-row--balanced {
+    grid-template-columns: 1fr;
+  }
+}
+
+// --- Repositories page -----------------------------------------------------
+
+.repo-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.repo-panel img {
+  width: 100%;
+  height: auto;
+}
+
+.repo-img-dark {
+  display: none;
+}
+
+[data-theme="light"] .repo-img-light {
+  display: block;
+}
+[data-theme="light"] .repo-img-dark {
+  display: none;
+}
+[data-theme="dark"] .repo-img-light {
+  display: none;
+}
+[data-theme="dark"] .repo-img-dark {
+  display: block;
+}
+:root:not([data-theme]) .repo-img-light {
+  display: none;
+}
+:root:not([data-theme]) .repo-img-dark {
+  display: block;
+}
+
+.repo-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .repo-grid.repo-grid--pins {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// --- Fault panel (404) ------------------------------------------------------
+
+.fault-panel {
+  border: 1px solid var(--role-highlight);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 0 24px -8px var(--role-highlight);
+}
+
+.fault-panel .eyebrow {
+  color: var(--role-highlight);
+}

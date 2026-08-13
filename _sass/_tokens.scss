@@ -1,0 +1,63 @@
+// -----------------------------------------------------------------------------
+// Design tokens — "flight instrument panel"
+// Dark  = night glass cockpit (lit instruments)
+// Light = day VFR sectional chart (paper)
+// Both map to the same semantic roles so components never branch on theme.
+// -----------------------------------------------------------------------------
+
+:root {
+  --bg: #1c1c1d;
+  --surface: #232326;
+  --surface-raised: #2a2a2e;
+  --border: #424246;
+
+  --ink: #dce6e2;
+  --ink-muted: #8a99a6;
+
+  --role-data: #4fd8e0; // headings / links / mono data
+  --role-active: #4cd787; // active nav / positive status
+  --role-highlight: #f2b84b; // eyebrows / caution / emphasis
+
+  --font-display: "Big Shoulders Display", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius: 3px;
+  --max-width: 860px;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f3eedd;
+  --surface: #eae2c8;
+  --surface-raised: #fffbf0;
+  --border: #b8a97c;
+
+  --ink: #2b2418;
+  --ink-muted: #6b6046;
+
+  --role-data: #2e6e8e;
+  --role-active: #3f7d4a;
+  --role-highlight: #a6447a;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3eedd;
+    --surface: #eae2c8;
+    --surface-raised: #fffbf0;
+    --border: #b8a97c;
+
+    --ink: #2b2418;
+    --ink-muted: #6b6046;
+
+    --role-data: #2e6e8e;
+    --role-active: #3f7d4a;
+    --role-highlight: #a6447a;
+
+    color-scheme: light;
+  }
+}

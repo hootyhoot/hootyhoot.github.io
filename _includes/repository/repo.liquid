@@ -5,17 +5,17 @@
   {% assign show_owner = true %}
 {% endif %}
 
-<div class="repo p-2 text-center">
+<div class="repo-panel">
   <a href="https://github.com/{{ include.repository }}">
     <img
-      class="repo-img-light w-100"
+      class="repo-img-light"
       alt="{{ include.repository }}"
-      src="https://github-stats-git-main-mikhail-codes.vercel.app/api/pin/?username={{ repo_url[0] }}&repo={{ repo_url[1] }}&theme={{ site.repo_theme_light }}&show_owner={{ show_owner }}"
+      src="https://github-stats-git-main-mikhail-codes.vercel.app/api/pin/?username={{ repo_url[0] }}&repo={{ repo_url[1] }}&show_owner={{ show_owner }}&hide_border=true&bg_color=f3eedd&title_color=2e6e8e&icon_color=3f7d4a&text_color=2b2418"
     >
     <img
-      class="repo-img-dark w-100"
+      class="repo-img-dark"
       alt="{{ include.repository }}"
-      src="https://github-stats-git-main-mikhail-codes.vercel.app/api/pin/?username={{ repo_url[0] }}&repo={{ repo_url[1] }}&theme={{ site.repo_theme_dark }}&show_owner={{ show_owner }}"
+      src="https://github-stats-git-main-mikhail-codes.vercel.app/api/pin/?username={{ repo_url[0] }}&repo={{ repo_url[1] }}&show_owner={{ show_owner }}&hide_border=true&bg_color=0b0e13&title_color=4fd8e0&icon_color=4cd787&text_color=dce6e2"
     >
   </a>
 </div>

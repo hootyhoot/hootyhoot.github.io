@@ -5,7 +5,6 @@ description: a study in replicate api and vercel deployments
 img: assets/img/sdxl.jpg
 importance: 1
 category: personal
-related_publications: false
 ---
 
 With this project I am hoping to build a foundation of knowledge to later create my book recommendation app. Moving forward, I will also be using this to generate the images used on this site.
@@ -18,27 +17,27 @@ More info on the implementation at the bottom.
 
 Here are a few samples of the images that SDXL generated, all of these were generated on an Nvidia A40L with about 10s runtime for each. 
 
-<div class="row">
+<div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl2.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
-        <div class="caption">
+        <div class="figure-caption">
             I prompted it to create a sample image but instead it spit out a beautifully vibrant and abstract line art.
         </div>
     </div>
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl3.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
-        <div class="caption">
+        <div class="figure-caption">
             "top down drone shot of a future city in bladerunner style"
         </div>
     </div>
 </div>
 
-<div class="row">
+<div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
-<div class="caption">
+<div class="figure-caption">
     This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
 </div>
 

@@ -1,31 +1,24 @@
-<ul class="card-text font-weight-light list-group list-group-flush">
+<ul class="flight-log">
   {% for content in data[1] %}
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-xs-2 cl-sm-2 col-md-2 text-center" style="width: 75px">
-          {% if content.startDate %}
-            {% assign startDate = content.startDate | split: '-' | slice: 0, 2 | join: '.' %}
-            {% assign endDate = content.endDate | split: '-' | slice: 0, 2 | join: '.' | default: 'Present' %}
-            {% assign date = startDate | append: ' - ' %}
-            {% assign date = date | append: endDate %}
-          {% else %}
-            {% assign date = '' %}
-          {% endif %}
-          <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px"> {{ date }} </span>
-        </div>
-        <div class="col-xs-10 cl-sm-10 col-md-10 mt-2 mt-md-0">
-          <h6 class="title font-weight-bold ml-1 ml-md-4">
-            <a href="{{ content.url }}">{{ content.name }}</a>
-          </h6>
-          <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem; font-style: italic">{{ content.summary }}</h6>
-          <ul class="items">
-            {% for item in content.highlights %}
-              <li>
-                <span class="item">{{ item }}</span>
-              </li>
-            {% endfor %}
+    <li class="log-entry">
+      <div class="log-date">
+        {% if content.startDate %}
+          {{ content.startDate | date: '%Y.%m' }}<br>
+          &ndash; {{ content.endDate | date: '%Y.%m' | default: 'now' }}
+        {% endif %}
+      </div>
+      <div class="log-content">
+        {% if content.url %}
+          <a class="log-title" href="{{ content.url }}" target="_blank" rel="noopener noreferrer">{{ content.name }}</a>
+        {% else %}
+          <span class="log-title">{{ content.name }}</span>
+        {% endif %}
+        {% if content.summary %}<p class="log-summary">{{ content.summary }}</p>{% endif %}
+        {% if content.highlights %}
+          <ul class="tag-list">
+            {% for item in content.highlights %}<li class="tag">{{ item }}</li>{% endfor %}
           </ul>
-        </div>
+        {% endif %}
       </div>
     </li>
   {% endfor %}
