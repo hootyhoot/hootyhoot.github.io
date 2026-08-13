@@ -6,7 +6,7 @@ subtitle: Embedded Systems Engineer @ WyseTime Technologies
 
 profile:
   align: right
-  image: prof_pic.jpg
+  image: prof_pic.webp
   image_circular: false # crops the image to make it circular
 
 news: true # includes a list of news items
