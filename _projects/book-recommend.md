@@ -4,7 +4,7 @@ title: book recommend
 description: text embeddings based book recommendations
 img: assets/img/book-recommend.jpg
 importance: 1
-category: HIDDENpersonal
+category: personal
 ---
 
 On the summer break after my first year I decided to take a research internship under the university so that I wasn't rotting in bed for 3 months. My task was simple, find something that interested me, then research and implement that idea.
