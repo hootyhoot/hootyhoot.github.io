@@ -2,7 +2,7 @@
 layout: page
 title: stable diffusion study
 description: a study in replicate api and vercel deployments
-img: assets/img/sdxl.jpg
+img: assets/img/sdxl.webp
 importance: 1
 category: personal
 ---

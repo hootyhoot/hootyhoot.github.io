@@ -2,7 +2,7 @@
 layout: page
 title: nand2tetris
 description: building a computer from the ground up
-img: assets/img/nand2tetris.jpeg
+img: assets/img/nand2tetris.webp
 importance: 2
 category: school
 ---

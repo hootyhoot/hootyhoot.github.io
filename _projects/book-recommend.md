@@ -2,7 +2,7 @@
 layout: page
 title: book recommend
 description: text embeddings based book recommendations
-img: assets/img/book-recommend.jpg
+img: assets/img/book-recommend.webp
 importance: 1
 category: personal
 ---
