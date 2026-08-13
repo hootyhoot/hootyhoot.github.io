@@ -537,29 +537,7 @@ figure video {
 .repo-panel img {
   width: 100%;
   height: auto;
-}
-
-.repo-img-dark {
-  display: none;
-}
-
-[data-theme="light"] .repo-img-light {
-  display: block;
-}
-[data-theme="light"] .repo-img-dark {
-  display: none;
-}
-[data-theme="dark"] .repo-img-light {
-  display: none;
-}
-[data-theme="dark"] .repo-img-dark {
-  display: block;
-}
-:root:not([data-theme]) .repo-img-light {
-  display: none;
-}
-:root:not([data-theme]) .repo-img-dark {
-  display: block;
+  min-height: 2rem;
 }
 
 .repo-grid {
