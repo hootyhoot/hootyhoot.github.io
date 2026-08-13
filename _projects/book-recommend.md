@@ -37,86 +37,46 @@ First, I decided on the Goodreads top 10000 books dataset since I wanted to reco
 Embeddings were also practically free from OpenAI with the <em>text-embedding-3-small</em> model being just $0.02 per million tokens so I settled for that rather than running an embedding model locally.
 
 <h4>Implementation</h4>
-The code itself was relatively simple
+The code itself was relatively simple, and splits cleanly into two halves: a preprocessing step that only ever runs once, and the actual Flask app that runs on every request.
 
+For preprocessing, I started from the Goodreads top 10000 books CSV and ran it through a quick language filter first (a lot of the "top 10000" turned out to be non-English editions), then combined each book's title, description, and genres into one blob of text per book and cleaned it up with NLTK: strip URLs and punctuation, lowercase, tokenize, drop stopwords, lemmatize. That cleaned text is what actually gets embedded, not the raw description.
 
-<div class="figure-row cols-2">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="figure-caption">
-    This is my favorite image generated from SD, I asked for an "Akira" style fisheye image of a bartender and it delivered!
-</div>
-
----
-The code itself is simple and can be found <a href="https://github.com/hootyhoot/replicate-sdxl">here</a>.
-But this all wasn't just for me to learn JS but rather the replicate API and hosting on Vercel.
-
-First we initialise a Next.js app using:
-{% raw %}
-
-```bash
-npx create-next-app@latest
-```
-
-{% endraw %}
-Then we can layout the page by editing the pages.js.
-
-For the replicate call itself:
+Embedding 10000 books one at a time would've taken forever, so I batched the whole thing through OpenAI's API asynchronously with aiohttp, with a retry loop that backs off for a minute whenever the rate limiter kicks in:
 
 {% raw %}
 
-```js
-
-import Replicate from "replicate";
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
-
-//the rest of the JS
-
-const output = await replicate.run(
-  "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-  {
-    input: {
-      prompt: "top down drone view of a future city in Bladerunner style"
+```python
+async def get_openai_embedding(session, text):
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {os.getenv('openai_key')}",
     }
-  }
-);
-
-//then the error handling for the response
+    data = {"input": text, "model": "text-embedding-3-small"}
+    async with session.post("https://api.openai.com/v1/embeddings", headers=headers, json=data) as response:
+        result = await response.json()
+        if "data" in result:
+            return result["data"][0]["embedding"]
+        elif result.get("error", {}).get("code") == "rate_limit_exceeded":
+            await asyncio.sleep(60)
+            return await get_openai_embedding(session, text)  # retry
 ```
 
 {% endraw %}
 
-Then we can push to Github and deploy on vercel. For that we have to do the following:
+Once every book has an embedding, I dump the whole dataset to Parquet instead of CSV. Loading 10000 embedding vectors back out of a CSV (parsing floats row by row) is noticeably slower and heavier than just reading a Parquet file, and this file gets loaded fresh every time the app boots.
 
-We first install Vercel using npx:
-{% raw %}
+<h4>The app</h4>
+At runtime the Flask app just loads that Parquet file once on startup and answers two kinds of requests:
 
-```bash
-npx vercel
-```
+<ul>
+    <li>
+        <strong>Search by description:</strong> clean the query the same way the dataset was cleaned, get back a single embedding from OpenAI for it, then run cosine similarity against all 10000 precomputed vectors and return the top 15.
+    </li>
+    <li>
+        <strong>Search by title:</strong> fuzzy-match the input against the book list with fuzzywuzzy first, since nobody types a title exactly right. If the match is confident (92%+), it reuses <em>that book's own precomputed embedding</em> to find similar books &mdash; no OpenAI call needed at all for this path. If it's not confident enough, it just hands back the closest title matches instead of guessing and being wrong about it.
+    </li>
+</ul>
 
-{% endraw %}
+So in practice, description search is the only thing that ever touches the OpenAI API at request time, and even that's a single cheap embedding call. Wrapped it in a Dockerfile and deployed it from there.
 
-Then we can set our environment variables/secrets using the below (allegedly, but I had troubles for the app to see my replicate token as it kept printing no token found. Instead I manually set it in the Vercel website under environment variables)
-{% raw %}
-
-```bash
-vercel env add REPLICATE_API_TOKEN
-```
-
-{% endraw %}
-
-And finally, we can deploy using: (I used all the default deployment settings except to not use tailwind CSS)
-{% raw %}
-
-```bash
-npx vercel deploy --prod
-```
-
-{% endraw %}
-
-Optionally you can also set a custom domain in the vercel dashboard.
+It's still very much a work in progress, but the code is up <a href="https://github.com/hootyhoot/book-recommender">here</a> and there's a live version running at <a href="https://books.mikhail.codes">books.mikhail.codes</a> if you want to actually try finding your next book with it.
