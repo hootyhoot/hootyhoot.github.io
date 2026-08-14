@@ -1,13 +1,4 @@
 (function () {
-  var navbar = document.getElementById('navbar');
-  var toggle = document.getElementById('nav-toggle');
-  if (!navbar || !toggle) return;
-
-  toggle.addEventListener('click', function () {
-    var open = navbar.classList.toggle('nav-open');
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', function () {
