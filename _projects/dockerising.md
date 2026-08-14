@@ -2,7 +2,6 @@
 layout: page
 title: dockerising METARbot
 description: rebuilding METARbot to be hosted in a container 
-img: assets/img/dockerising.webp
 importance: 3
 category: personal
 ---
