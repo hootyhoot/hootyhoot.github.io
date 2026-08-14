@@ -2,10 +2,23 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://github-stats-git-main-mikhail-codes.vercel.app">
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
 >
+
+<!-- McMaster-Carr-style instant navigation: same-origin links get
+     prerendered on hover/pointerdown in browsers that support the
+     Speculation Rules API. -->
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "href_matches": "/*" },
+    "eagerness": "moderate"
+  }]
+}
+</script>
 
 {% if site.icon.size <= 4 %}
   <link

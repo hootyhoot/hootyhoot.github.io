@@ -19,13 +19,13 @@ Here are a few samples of the images that SDXL generated, all of these were gene
 
 <div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/sdxl2.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl2.webp" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
         <div class="figure-caption">
             I prompted it to create a sample image but instead it spit out a beautifully vibrant and abstract line art.
         </div>
     </div>
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/sdxl3.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl3.webp" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
         <div class="figure-caption">
             "top down drone shot of a future city in bladerunner style"
         </div>
@@ -34,7 +34,7 @@ Here are a few samples of the images that SDXL generated, all of these were gene
 
 <div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/sdxl1.jpg" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/sdxl1.webp" title="stable diffusion generated image" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="figure-caption">

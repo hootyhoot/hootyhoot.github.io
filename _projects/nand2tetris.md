@@ -51,10 +51,10 @@ Mux16(a=fxy, b=nfxy, sel=no, out=output);
 
 <div class="figure-row figure-row--balanced" style="--ar-1: 1.368fr; --ar-2: 0.640fr;">
     <div>
-        {% include figure.liquid loading="eager" path="assets/img/nand2tetris1.jpg" title="ALU diagram" %}
+        {% include figure.liquid loading="eager" path="assets/img/nand2tetris1.webp" title="ALU diagram" %}
     </div>
     <div>
-        {% include figure.liquid loading="eager" path="assets/img/nand2tetris2.jpg" title="ALU diagram" %}
+        {% include figure.liquid loading="eager" path="assets/img/nand2tetris2.webp" title="ALU diagram" %}
     </div>
 </div>
 Basically, what the ALU does is that for any two 16 bit inputs, to output either the negation, addition, subtraction, conjunction, or disjunction of them. From the diagram above we can see that the ALU has 6 control bits, changing the values of these control bits according to the truth table will output the desired operation.

@@ -55,13 +55,13 @@ Now let's demo the bot!
 
 <div class="figure-row cols-2">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/dockerising1.png" title="metar bot trial for KLIA airport" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/dockerising1.webp" title="metar bot trial for KLIA airport" class="img-fluid rounded z-depth-1" %}
         <div class="figure-caption">
             What's the weather like in KLIA maybe?
         </div>
     </div>
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/dockerising2.png" title="metar bot trial for Changi airport" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/dockerising2.webp" title="metar bot trial for Changi airport" class="img-fluid rounded z-depth-1" %}
         <div class="figure-caption">
             How about Singapore Changi?
         </div>
