@@ -5,4 +5,5 @@ description: robots and AI projects from the semiconductor academy's NSEP track
 importance: 1
 category: school
 redirect: /asemboi/
+new_tab: true
 ---
