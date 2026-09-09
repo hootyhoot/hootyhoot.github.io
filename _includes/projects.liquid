@@ -1,4 +1,4 @@
-<a class="project-card" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}">
+<a class="project-card" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}"{% if project.redirect %} target="_blank" rel="noopener"{% endif %}>
   <div class="project-card-head">
     {% if project.category %}<span class="tag tag--category">{{ project.category }}</span>{% endif %}
     <span class="project-card-arrow">{% include icon.liquid name="arrow-right" %}</span>
