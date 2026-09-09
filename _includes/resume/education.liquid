@@ -9,13 +9,9 @@
         {% endif %}
       </div>
       <div class="log-content">
-        {% if content.url %}
-          <a class="log-title" href="{{ content.url }}" target="_blank" rel="noopener noreferrer">{{ content.studyType }}</a>
-        {% else %}
-          <span class="log-title">{{ content.studyType }}</span>
-        {% endif %}
+        <span class="log-title">{{ content.studyType }}</span>
         <p class="log-sub">
-          {{ content.institution }}{% if content.location %} &middot; {{ content.location }}{% endif %}
+          {% if content.url %}<a href="{{ content.url }}" target="_blank" rel="noopener noreferrer">{{ content.institution }}</a>{% else %}{{ content.institution }}{% endif %}{% if content.location %} &middot; {{ content.location }}{% endif %}
           {% if content.area %} &middot; {{ content.area }}{% endif %}
         </p>
         {% if content.courses %}
