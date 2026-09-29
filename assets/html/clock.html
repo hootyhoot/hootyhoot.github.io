@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>24 clocks</title>
+    <style>
+      :root {
+        --bg: #1c1c1d;
+        --face: #232326;
+        --rim: #424246;
+        --minute: #dce6e2;
+        --hour: #4fd8e0;
+        color-scheme: dark;
+      }
+      :root[data-theme="light"] {
+        --bg: #f3eedd;
+        --face: #fffbf0;
+        --rim: #b8a97c;
+        --minute: #2b2418;
+        --hour: #2e6e8e;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) {
+          --bg: #f3eedd;
+          --face: #fffbf0;
+          --rim: #b8a97c;
+          --minute: #2b2418;
+          --hour: #2e6e8e;
+          color-scheme: light;
+        }
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      svg {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .face {
+        fill: var(--face);
+        stroke: var(--rim);
+        stroke-width: 2;
+      }
+      .hand {
+        stroke-width: 7;
+        stroke-linecap: round;
+      }
+      .hand.m {
+        stroke: var(--minute);
+      }
+      .hand.h {
+        stroke: var(--hour);
+      }
+      .hub {
+        fill: var(--rim);
+      }
+
+      .hand {
+        transition: transform 1.6s cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hand {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 4 digits x (2 cols x 3 rows) = 24 clocks. viewBox is fixed and scaled with
+     preserveAspectRatio="meet": always centered, never clipped, ratio kept. -->
+    <svg id="stage" viewBox="0 0 980 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+
+    <script>
+      (function () {
+        var R = 46,
+          CELL = 100,
+          NS = "http://www.w3.org/2000/svg";
+        // Hand angles per node [hour, minute]; 0 = up, clockwise. Rows: TL TR / ML MR / BL BR.
+        var B = [225, 225];
+        var DIGITS = {
+          0: [
+            [90, 180],
+            [270, 180],
+            [0, 180],
+            [0, 180],
+            [0, 90],
+            [0, 270],
+          ],
+          1: [B, [180, 180], B, [0, 180], B, [0, 0]],
+          2: [
+            [90, 90],
+            [270, 180],
+            [90, 180],
+            [0, 270],
+            [0, 90],
+            [270, 270],
+          ],
+          3: [
+            [90, 90],
+            [270, 180],
+            [90, 90],
+            [0, 180],
+            [90, 90],
+            [0, 270],
+          ],
+          4: [[180, 180], [180, 180], [0, 90], [0, 180], B, [0, 0]],
+          5: [
+            [90, 180],
+            [270, 270],
+            [0, 90],
+            [270, 180],
+            [90, 90],
+            [0, 270],
+          ],
+          6: [
+            [90, 180],
+            [270, 270],
+            [0, 180],
+            [270, 180],
+            [0, 90],
+            [0, 270],
+          ],
+          7: [[90, 90], [270, 180], B, [0, 180], B, [0, 0]],
+          8: [
+            [90, 180],
+            [270, 180],
+            [90, 270],
+            [90, 270],
+            [0, 90],
+            [0, 270],
+          ],
+          9: [
+            [90, 180],
+            [270, 180],
+            [0, 90],
+            [0, 180],
+            [90, 90],
+            [0, 270],
+          ],
+        };
+        // x origin of each digit; wider gap between hours and minutes
+        var ORIGIN = [40, 260, 520, 740];
+
+        var svg = document.getElementById("stage");
+        var clocks = []; // 24 entries: { h, m, ha, ma }
+
+        function el(name, attrs, parent) {
+          var e = document.createElementNS(NS, name);
+          for (var k in attrs) e.setAttribute(k, attrs[k]);
+          parent.appendChild(e);
+          return e;
+        }
+
+        for (var d = 0; d < 4; d++) {
+          for (var i = 0; i < 6; i++) {
+            var cx = ORIGIN[d] + (i % 2) * CELL + CELL / 2 - 0;
+            var cy = 40 + Math.floor(i / 2) * CELL + CELL / 2;
+            var g = el("g", { transform: "translate(" + cx + " " + cy + ")" }, svg);
+            el("circle", { class: "face", r: R }, g);
+            var h = el("line", { class: "hand h", x1: 0, y1: 0, x2: 0, y2: -R + 4 }, g);
+            var m = el("line", { class: "hand m", x1: 0, y1: 0, x2: 0, y2: -R + 4 }, g);
+            el("circle", { class: "hub", r: 4 }, g);
+            clocks.push({ h: h, m: m, ha: 225, ma: 225 });
+            h.style.transform = m.style.transform = "rotate(225deg)";
+          }
+        }
+
+        // Always advance clockwise so hands sweep instead of unwinding.
+        function turn(current, target) {
+          var delta = (((target - current) % 360) + 360) % 360;
+          return current + delta;
+        }
+
+        var shown = "";
+        function tick() {
+          var now = new Date();
+          var s = ("0" + now.getHours()).slice(-2) + ("0" + now.getMinutes()).slice(-2);
+          if (s === shown) return;
+          shown = s;
+          for (var d = 0; d < 4; d++) {
+            var spec = DIGITS[s.charAt(d)];
+            for (var i = 0; i < 6; i++) {
+              var c = clocks[d * 6 + i];
+              c.ha = turn(c.ha, spec[i][0]);
+              c.ma = turn(c.ma, spec[i][1]);
+              c.h.style.transform = "rotate(" + c.ha + "deg)";
+              c.m.style.transform = "rotate(" + c.ma + "deg)";
+            }
+          }
+        }
+
+        tick();
+        setInterval(tick, 1000);
+
+        // Follow the site's theme toggle when embedded (same origin); otherwise the
+        // prefers-color-scheme media query above takes over.
+        try {
+          var root = document.documentElement,
+            parentRoot = window.parent.document.documentElement;
+          var sync = function () {
+            var t = parentRoot.getAttribute("data-theme");
+            if (t) root.setAttribute("data-theme", t);
+            else root.removeAttribute("data-theme");
+          };
+          sync();
+          new MutationObserver(sync).observe(parentRoot, { attributes: true, attributeFilter: ["data-theme"] });
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>
