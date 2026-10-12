@@ -44,20 +44,3 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #f3eedd;
-    --surface: #eae2c8;
-    --surface-raised: #fffbf0;
-    --border: #b8a97c;
-
-    --ink: #2b2418;
-    --ink-muted: #6b6046;
-
-    --role-data: #2e6e8e;
-    --role-active: #3f7d4a;
-    --role-highlight: #a6447a;
-
-    color-scheme: light;
-  }
-}

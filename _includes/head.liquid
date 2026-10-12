@@ -31,10 +31,7 @@
 
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 
-<script>
-  (function () {
-    var stored = localStorage.getItem('theme');
-    var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-    document.documentElement.setAttribute('data-theme', theme);
-  })();
+<script data-cfasync="false">
+  // theme cookie is shared with books.mikhail.codes; dark unless chosen otherwise
+  document.documentElement.setAttribute('data-theme', (document.cookie.match(/(?:^|; )theme=(light|dark)/) || [])[1] || 'dark');
 </script>

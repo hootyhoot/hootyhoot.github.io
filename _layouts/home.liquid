@@ -10,11 +10,8 @@
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
 <link rel="canonical" href="https://mikhail.codes/">
 <script data-cfasync="false">
-  (function () {
-    var t = null;
-    try { t = localStorage.getItem('theme'); } catch (e) {}
-    document.documentElement.setAttribute('data-theme', t || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
-  })();
+  // theme cookie is shared with books.mikhail.codes; dark unless chosen otherwise
+  document.documentElement.setAttribute('data-theme', (document.cookie.match(/(?:^|; )theme=(light|dark)/) || [])[1] || 'dark');
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -334,7 +331,7 @@ const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(
 document.getElementById('theme').addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('theme', next); } catch (e) {}
+  document.cookie = 'theme=' + next + '; path=/; max-age=31536000; SameSite=Lax' + (/(^|\.)mikhail\.codes$/.test(location.hostname) ? '; domain=mikhail.codes' : '');
   dispatchEvent(new Event('themechange'));
 });
 
