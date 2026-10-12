@@ -26,7 +26,8 @@
   <link rel="shortcut icon" href="{{ site.icon | prepend: '/assets/img/' | relative_url }}">
 {% endif %}
 
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+{%- comment -%} ?v= busts Cloudflare's 30-minute edge cache on every rebuild {%- endcomment -%}
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 
 <script data-cfasync="false">
   // theme cookie is shared with books.mikhail.codes; dark unless chosen otherwise
