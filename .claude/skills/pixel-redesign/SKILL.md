@@ -86,8 +86,11 @@ next to this file - read them before writing anything:
   stars (45% 1px specks, 35% small, 15% medium, 5% big with a diagonal bloom)
   whose arms step in and out as they glimmer, plus a shooting star every
   6-15s on a 30-60 degree diagonal with a solid tapering tail. Clouds are drawn
-  after the stars so they pass in front. `data-clouds="off"` where another
-  canvas already draws clouds (the homepage hero, renamed `hero-sky`).
+  after the stars so they pass in front. By day: three parallax cloud layers
+  (far/mid/near, shaded toward the background), a far-off jet every 20-40s
+  laying a twin contrail that widens, merges and fades, and V-formations of
+  flapping birds every 12-25s; drawn between cloud layers for depth.
+  `data-clouds="off"` skips the clouds.
 - **Ground strip:** 24px checkered bar (`--shadow`/`--ground-2`) with a 6px
   green top edge, plus a **stalactite band** under it: a separate canvas below
   the hero (the hero has `overflow:hidden`) with a negative bottom margin so it

@@ -41,7 +41,7 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:"Silkscreen",monospace;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
 img{image-rendering:pixelated}
-/* night sky behind the whole page (assets/js/sky.js): stars + shooting stars in dark mode */
+/* sky behind the whole page (assets/js/sky.js): layered clouds; stars + shooting stars at night; jets + birds by day */
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 .mono{font-family:"JetBrains Mono",monospace}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
@@ -193,7 +193,7 @@ header nav a:hover{color:var(--build)}
 </style>
 </head>
 <body>
-<canvas id="sky" data-clouds="off" aria-hidden="true"></canvas>
+<canvas id="sky" aria-hidden="true"></canvas>
 
 <header>
   <a class="name" href="#">Mikhail Armanuel</a>
@@ -379,7 +379,7 @@ let li = 0;
 
 document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2003}`;
 
-// ---------- hero sky: drifting pixel clouds + blocks that fall and pile on the ground ----------
+// ---------- hero: blocks that fall and pile on the ground (clouds/stars/jets/birds come from sky.js) ----------
 (() => {
   const c = document.getElementById('hero-sky'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -387,14 +387,13 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   const deep = {build: '--build-deep', agent: '--agent-deep', sky: '--sky-deep', ink: '--muted'};
   let pal;
   const loadPal = () => {
-    pal = {cloud: cssVar('--cloud')};
+    pal = {};
     for (const t of tones) { pal[t] = cssVar('--' + t); pal[t + '-d'] = cssVar(deep[t]); }
   };
   loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) frame(); });
-  let W, H, clouds = [], blocks = [], piles = {};
+  let W, H, blocks = [], piles = {};
   function size() {
     W = c.width = c.offsetWidth; H = c.height = c.offsetHeight;
-    clouds = Array.from({length: 7}, () => ({x: Math.random()*W, y: Math.random()*H*0.55, w: 3+Math.random()*6|0, v: .15+Math.random()*.3}));
     // drop blocks that are now off-screen, re-stack the rest in place
     blocks = blocks.filter(b => b.x <= W - P);
     restack();
@@ -428,12 +427,6 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   };
   function frame() {
     x.clearRect(0, 0, W, H);
-    x.fillStyle = pal.cloud;
-    for (const cl of clouds) {
-      for (let i = 0; i < cl.w; i++) x.fillRect((cl.x + i*P)|0, cl.y|0, P, P);
-      for (let i = 1; i < cl.w-1; i++) x.fillRect((cl.x + i*P)|0, (cl.y-P)|0, P, P);
-      cl.x += cl.v; if (cl.x > W) cl.x = -cl.w*P;
-    }
     const ground = H - 24 - 6;
     for (const b of blocks) {
       if (!b.landed) {
