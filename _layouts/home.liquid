@@ -96,6 +96,9 @@ header nav a:hover{color:var(--build)}
 .socials a:hover{color:var(--ink)}
 .ground{position:absolute;left:0;right:0;bottom:0;height:24px;background:repeating-linear-gradient(90deg,var(--shadow) 0 24px,var(--ground-2) 24px 48px);z-index:1}
 .ground::before{content:"";position:absolute;inset:-6px 0 auto 0;height:6px;background:var(--ground-top)}
+/* stalactites hanging under the ground strip; overlaps the next section's top padding */
+.under{position:relative;z-index:1;height:72px;margin-bottom:-72px;pointer-events:none}
+.under canvas{display:block;width:100%;height:100%}
 /* hover tooltip card */
 .tip{position:absolute;left:50%;margin-left:-130px;text-align:left;top:calc(100% + 12px);width:260px;padding:14px;font-size:12px;line-height:1.5;color:var(--ink);opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .12s steps(2),transform .12s steps(2);z-index:5;border-color:var(--accent)}
 .tip b{display:block;color:var(--accent);font-weight:400;margin-bottom:4px}
@@ -222,6 +225,7 @@ header nav a:hover{color:var(--build)}
   </div>
   <div class="ground"></div>
 </section>
+<div class="under" aria-hidden="true"><canvas id="under"></canvas></div>
 
 <section id="projects"><div class="wrap">
   <h2>Projects</h2>
@@ -440,6 +444,60 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     if (!reduce) requestAnimationFrame(frame);
   }
   frame();
+})();
+
+// ---------- underground: pixel stalactites with the odd drip ----------
+(() => {
+  const c = document.getElementById('under'), x = c.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const P = 8, H = 72;
+  let W, heights = [], tips = [], drips = [], body, tip;
+  const loadPal = () => { body = cssVar('--shadow'); tip = cssVar('--ground-2'); };
+  function build() {
+    const dpr = devicePixelRatio || 1;
+    W = c.clientWidth;
+    c.width = W*dpr; c.height = H*dpr;
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cols = Math.ceil(W/P);
+    heights = new Array(cols).fill(0); tips = [];
+    // walk across: gap, then a tapered stalactite (tallest in the middle)
+    for (let col = Math.random()*3|0; col < cols;) {
+      const w = 2 + (Math.random()*5|0), peak = 2 + (Math.random()*6|0);
+      for (let i = 0; i < w && col + i < cols; i++) {
+        const t = 1 - Math.abs(i - (w - 1)/2) / (w/2 + .5);
+        heights[col + i] = Math.max(1, Math.round(peak*t));
+      }
+      const mid = col + (w - 1)/2 | 0;
+      if (mid < cols) tips.push(mid);
+      col += w + 1 + (Math.random()*7|0);
+    }
+    // a few single-block bumps in the gaps so the underside isn't perfectly flat
+    for (let i = 0; i < cols; i++) if (!heights[i] && Math.random() < .25) heights[i] = 1;
+  }
+  function draw() {
+    x.clearRect(0, 0, W, H);
+    heights.forEach((h, i) => {
+      if (!h) return;
+      x.fillStyle = body; x.fillRect(i*P, 0, P, (h - 1)*P);
+      x.fillStyle = h > 1 ? tip : body; x.fillRect(i*P, (h - 1)*P, P, P);
+    });
+    x.fillStyle = tip;
+    drips = drips.filter(d => d.y < H);
+    for (const d of drips) { x.globalAlpha = Math.max(0, 1 - d.y/H); x.fillRect(d.x, d.y, 4, 4); d.y += d.v; d.v += .15; }
+    x.globalAlpha = 1;
+  }
+  function frame() {
+    if (Math.random() < .012 && tips.length) {
+      const t = tips[Math.random()*tips.length|0];
+      drips.push({x: t*P + 2, y: heights[t]*P, v: .4});
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+  loadPal(); build();
+  addEventListener('resize', () => { build(); if (reduce) draw(); });
+  addEventListener('themechange', () => { loadPal(); if (reduce) draw(); });
+  if (reduce) draw(); else frame();
 })();
 
 // ---------- stat bars ----------
