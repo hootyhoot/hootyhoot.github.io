@@ -1,5 +1,5 @@
 ---
-layout: about
+layout: home
 title: about
 permalink: /
 subtitle: Embedded Systems Engineer @ WyseTime Technologies
