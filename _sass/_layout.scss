@@ -8,8 +8,16 @@
   padding: 0 1.5rem;
 }
 
+// footer sits at the bottom of the window even when the page is short
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 main {
   display: block;
+  flex: 1 0 auto;
   padding: 2.5rem 0 5rem;
 }
 
