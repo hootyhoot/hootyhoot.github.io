@@ -3,7 +3,7 @@ layout: default
 ---
 <header class="page-header">
   <div class="section-heading">
-    <h1 style="margin-bottom:0">{{ page.title }}</h1>
+    {% include pixel-title.liquid text=page.title style='margin-bottom:0' %}
     {% if page.cv_pdf %}
       <a class="btn" href="{{ page.cv_pdf | prepend: 'assets/pdf/' | relative_url }}" target="_blank" rel="noopener noreferrer">
         {% include icon.liquid name="file" %} download pdf

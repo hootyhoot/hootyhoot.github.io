@@ -1,0 +1,20 @@
+{%- comment -%}
+  Per-letter bobbing title (see .pixel-title in _base.scss). Letters are
+  grouped per word so phones wrap between words, not mid-word. Delays are
+  inline because jekyll-minifier mangles var() inside calc().
+{%- endcomment -%}
+{%- assign words = include.text | split: ' ' -%}
+{%- assign n = 0 -%}
+<h1 class="pixel-title" aria-label="{{ include.text }}"{% if include.style %} style="{{ include.style }}"{% endif %}>
+  {%- for word in words -%}
+    <span class="pixel-word">
+      {%- assign chars = word | split: '' -%}
+      {%- for ch in chars -%}
+        {%- assign d = n | times: 70 | plus: 100 -%}
+        {%- assign b = n | times: 40 | plus: d | plus: 600 -%}
+        <span aria-hidden="true" style="animation-delay:{{ d }}ms,{{ b }}ms">{{ ch }}</span>
+        {%- assign n = n | plus: 1 -%}
+      {%- endfor -%}
+    </span>
+  {%- endfor -%}
+</h1>

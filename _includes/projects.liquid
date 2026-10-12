@@ -1,8 +1,0 @@
-<a class="project-card" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}"{% if project.new_tab %} target="_blank" rel="noopener"{% endif %}>
-  <div class="project-card-head">
-    {% if project.category %}<span class="tag tag--category">{{ project.category }}</span>{% endif %}
-    <span class="project-card-arrow">{% include icon.liquid name="arrow-right" %}</span>
-  </div>
-  <h3 class="project-card-title">{{ project.title }}</h3>
-  {% if project.description %}<p class="project-card-desc">{{ project.description }}</p>{% endif %}
-</a>

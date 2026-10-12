@@ -17,26 +17,15 @@ html {
   background: var(--bg);
 }
 
-// Full-viewport clock artwork behind everything, with a frosted layer on top.
-.bg-clock,
-.bg-frost {
+// Drifting pixel clouds behind everything (assets/js/sky.js), same as the
+// homepage hero and books.mikhail.codes.
+#sky {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  border: 0;
-  pointer-events: none;
-}
-
-.bg-clock {
-  z-index: -2;
-}
-
-.bg-frost {
   z-index: -1;
-  background: color-mix(in srgb, var(--bg) 48%, transparent);
-  -webkit-backdrop-filter: blur(7px) saturate(1.1);
-  backdrop-filter: blur(7px) saturate(1.1);
+  pointer-events: none;
 }
 
 body {
@@ -44,9 +33,9 @@ body {
   background: transparent;
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.6;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
 }
 
 img,
@@ -70,27 +59,72 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   line-height: 1.1;
   margin: 0 0 0.5em;
   color: var(--ink);
 }
 
 h1 {
-  font-size: clamp(2.6rem, 6vw, 4.5rem);
-  font-weight: 800;
+  font-size: clamp(2.2rem, 7vw, 4rem);
 }
 
 h2 {
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
-  text-transform: uppercase;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
 }
 
 h3 {
-  font-size: 1.15rem;
-  text-transform: uppercase;
+  font-size: 1rem;
   letter-spacing: 0.04em;
+}
+
+// Page titles: per-letter drop-in then bob, same as the homepage name.
+// Delays are set inline by _includes/pixel-title.liquid - jekyll-minifier
+// mangles var() inside calc(), so they can't be computed here.
+.pixel-title {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.5em;
+  user-select: none;
+}
+
+.pixel-title .pixel-word {
+  display: flex;
+  white-space: nowrap;
+}
+
+.pixel-title .pixel-word span {
+  display: inline-block;
+  opacity: 0;
+  animation: pixel-drop 0.5s steps(6) forwards, pixel-bob 1.8s steps(6) infinite;
+}
+
+.pixel-title .pixel-word span:nth-child(3n + 1) {
+  color: var(--role-active);
+}
+
+@keyframes pixel-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pixel-bob {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
 }
 
 p {
@@ -110,7 +144,8 @@ pre {
 pre {
   background: color-mix(in srgb, var(--role-data) 7%, var(--surface));
   color: var(--role-data);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
   border-radius: var(--radius);
   padding: 1em;
   overflow-x: auto;
@@ -201,7 +236,7 @@ pre code {
 
 hr {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 2px dotted var(--border);
   margin: 2em 0;
 }
 

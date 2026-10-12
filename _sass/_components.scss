@@ -10,7 +10,7 @@
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 2.5rem;
-  animation: hero-in 0.5s ease both;
+  animation: hero-in 0.5s steps(4) both;
 }
 
 @keyframes hero-in {
@@ -59,7 +59,8 @@
 }
 
 .status-strip {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
   background: var(--surface);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
@@ -122,6 +123,10 @@
   margin: 0;
 }
 
+.section-heading h1 {
+  margin: 0;
+}
+
 .section-link {
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -139,21 +144,21 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--border);
+  border-top: 2px dotted var(--border);
 }
 
 .log-entry {
   display: flex;
   gap: 1.25rem;
   padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px dotted var(--border);
 }
 
 .log-date {
   flex: 0 0 5.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--role-data);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
   line-height: 1.4;
   padding-top: 0.15rem;
 }
@@ -164,8 +169,8 @@
 }
 
 .log-title {
-  font-family: var(--font-body);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 0.98rem;
   color: var(--ink);
   margin: 0 0 0.2rem;
@@ -173,7 +178,8 @@
 }
 
 a.log-title:hover {
-  color: var(--role-data);
+  text-decoration: none;
+  color: var(--role-active);
 }
 
 .log-content p {
@@ -224,7 +230,7 @@ a.log-title:hover {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--ink-muted);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 0.2rem 0.5rem;
   background: var(--surface);
@@ -233,24 +239,37 @@ a.log-title:hover {
 .tag--category {
   color: var(--role-highlight);
   border-color: var(--role-highlight);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
 }
 
 // --- Panels (CV sections, repo panels, 404) ---------------------------------
 
 .panel {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   background: var(--surface);
   border-radius: var(--radius);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   scroll-margin-top: 5rem;
 }
 
+// green block marker, same as the homepage section headings
 .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin-bottom: 1rem;
-  color: var(--role-active);
+}
+
+.panel-title::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--role-active);
+  box-shadow: 3px 3px 0 var(--hard-shadow);
 }
 
 .skill-group + .skill-group {
@@ -283,7 +302,7 @@ a.log-title:hover {
 }
 
 .reference-item {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 0.9rem 1rem;
   background: var(--surface-raised);
@@ -308,10 +327,9 @@ a.log-title:hover {
 // --- CV about / summary ------------------------------------------------
 
 .cv-basics dt {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
   color: var(--ink-muted);
-  text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-top: 0.75rem;
 }
@@ -322,25 +340,33 @@ a.log-title:hover {
 
 // --- Buttons / CTAs -------------------------------------------------------
 
+// pixel button that presses in, same as the homepage CTA
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem 0.8rem;
-  color: var(--ink);
-  background: var(--surface);
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  border: 0;
+  border-radius: 0;
+  padding: 0.7rem 1rem;
+  color: var(--bg);
+  background: var(--role-active);
+  box-shadow: 5px 5px 0 var(--role-active-deep);
+  white-space: nowrap;
+  transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
 }
 
 .btn:hover {
-  border-color: var(--role-data);
-  color: var(--role-data);
   text-decoration: none;
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 var(--role-active-deep);
+}
+
+.btn:active {
+  transform: translate(5px, 5px);
+  box-shadow: none;
 }
 
 .btn svg {
@@ -351,7 +377,7 @@ a.log-title:hover {
 // --- Social / contact channels ----------------------------------------------
 
 .social-section {
-  border-top: 1px solid var(--border);
+  border-top: 2px dotted var(--border);
   padding-top: 1.5rem;
 }
 
@@ -369,7 +395,8 @@ a.log-title:hover {
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 0.9rem;
-  border: 1px solid var(--border);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   color: var(--ink);
   background: var(--surface);
@@ -392,10 +419,9 @@ a.log-title:hover {
 // --- Project cards ----------------------------------------------------------
 
 .category-heading {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   color: var(--role-highlight);
   margin: 2rem 0 1rem;
 }
@@ -408,19 +434,19 @@ a.log-title:hover {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
   padding: 1.4rem 1.3rem 1.5rem;
   color: var(--ink);
-  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
 }
 
 .project-card:hover {
-  border-color: var(--role-data);
   text-decoration: none;
-  transform: translateY(-3px);
-  box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.55);
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 var(--role-active);
 }
 
 .project-card-head {
@@ -435,7 +461,7 @@ a.log-title:hover {
   width: 1rem;
   height: 1rem;
   color: var(--ink-muted);
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition: color 0.1s steps(2), transform 0.1s steps(2);
 }
 
 .project-card:hover .project-card-arrow {
@@ -446,8 +472,8 @@ a.log-title:hover {
 .project-card-title {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.35rem;
+  font-weight: 400;
+  font-size: 1.2rem;
   text-transform: none;
   letter-spacing: normal;
   line-height: 1.15;
@@ -468,13 +494,13 @@ figure {
 
 figure img,
 figure video {
-  border-radius: 0.25rem;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  border: 2px solid var(--border);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
 }
 
 .figure-caption {
   font-family: var(--font-body);
-  font-weight: 300;
+  font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ink);
@@ -533,7 +559,8 @@ figure video {
 // --- Repositories page -----------------------------------------------------
 
 .repo-panel {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
   border-radius: var(--radius);
   background: var(--surface);
   padding: 0.75rem;
@@ -561,12 +588,12 @@ figure video {
 // --- Fault panel (404) ------------------------------------------------------
 
 .fault-panel {
-  border: 1px solid var(--role-highlight);
+  border: 2px solid var(--role-highlight);
   border-radius: var(--radius);
   background: var(--surface);
   padding: 2.5rem 2rem;
   text-align: center;
-  box-shadow: 0 0 24px -8px var(--role-highlight);
+  box-shadow: 6px 6px 0 var(--hard-shadow);
 }
 
 .fault-panel .eyebrow {

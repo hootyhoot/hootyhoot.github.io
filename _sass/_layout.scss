@@ -13,85 +13,84 @@ main {
   padding: 2.5rem 0 5rem;
 }
 
-// --- Header / nav -----------------------------------------------------------
+// --- Header / nav (mirrors the homepage header) ----------------------------
 
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  border-bottom: 2px solid var(--border);
 }
 
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 1.5rem;
-  max-width: var(--max-width);
-  margin: 0 auto;
+  padding: 20px 32px;
+}
+
+.nav-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.nav-name:hover {
+  text-decoration: none;
+  color: var(--role-active);
 }
 
 .nav-panel {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  gap: 28px;
 }
 
 .nav-btn {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 13px;
   color: var(--ink-muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.45rem 0.7rem;
-  line-height: 1;
   white-space: nowrap;
-  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  line-height: 1;
 }
 
-.nav-btn:hover {
-  text-decoration: none;
-  color: var(--ink);
-  border-color: var(--role-data);
-}
-
+.nav-btn:hover,
 .nav-btn[aria-current="page"] {
+  text-decoration: none;
   color: var(--role-active);
-  border-color: var(--role-active);
-  box-shadow: 0 0 0 1px var(--role-active), 0 0 10px -2px var(--role-active);
 }
 
 .theme-toggle {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--hard-shadow);
   color: var(--ink);
-  width: 2.2rem;
-  height: 2.2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
+  transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
 }
 
 .theme-toggle:hover {
-  border-color: var(--role-data);
+  border-color: var(--role-active);
+}
+
+.theme-toggle:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
 }
 
 .theme-toggle svg {
-  width: 1rem;
-  height: 1rem;
+  width: 16px;
+  height: 16px;
+  shape-rendering: crispEdges;
 }
 
 .theme-toggle .icon-moon {
@@ -101,26 +100,29 @@ main {
 [data-theme="light"] .theme-toggle .icon-sun {
   display: none;
 }
+
 [data-theme="light"] .theme-toggle .icon-moon {
   display: block;
 }
 
-@media (max-width: 600px) {
+// Phones: same as the homepage - keep only the CV link and the toggle.
+@media (max-width: 640px) {
   .navbar {
-    flex-wrap: wrap;
+    padding: 16px 18px;
   }
 
-  .nav-btn {
-    flex: 1 1 auto;
-    text-align: center;
+  .nav-btn:not(.nav-btn--keep) {
+    display: none;
   }
 }
 
-// --- Footer -------------------------------------------------------------
+// --- Footer: striped pixel ground, same as homepage + books ----------------
 
 .site-footer {
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 0;
+  margin-top: 2rem;
+  padding: 24px 0;
+  border-top: 6px solid var(--role-active-deep);
+  background: repeating-linear-gradient(90deg, var(--stripe-a) 0 24px, var(--stripe-b) 24px 48px);
 }
 
 .site-footer .container {
@@ -129,8 +131,8 @@ main {
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 11px;
   color: var(--ink-muted);
 }
 
@@ -146,11 +148,10 @@ main {
 
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   color: var(--role-highlight);
   margin-bottom: 0.6rem;
 }

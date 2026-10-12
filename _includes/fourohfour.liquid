@@ -1,0 +1,273 @@
+{%- comment -%}
+  The 404 page: block "404", holding-pattern plane, split-flap board.
+  Rendered at /404.html (served by Caddy for missing pages) and at /404/
+  (a permanent link to play with). No auto-redirect.
+{%- endcomment -%}
+<style>
+.fourohfour{text-align:center}
+.fourohfour .eyebrow{color:var(--role-highlight)}
+.fourohfour .pixel-title{justify-content:center;margin:0 0 .4rem}
+.fourohfour .sub{color:var(--ink-muted);max-width:52ch;margin:0 auto 1.5rem}
+/* full-bleed stage so the ground runs edge to edge like the homepage hero */
+html{overflow-x:clip}
+.stage{position:relative;width:100vw;margin:0 0 1rem calc(50% - 50vw)}
+.stage canvas{display:block;width:100%;cursor:pointer}
+.fourohfour .hint{font-family:var(--font-display);font-size:10px;color:var(--ink-muted);margin:0}
+
+/* split-flap departure board */
+.board{display:inline-block;text-align:left;background:#0a0a09;border:2px solid var(--border);box-shadow:6px 6px 0 var(--hard-shadow);padding:14px 16px 10px;margin:.5rem 0 2rem;max-width:100%;overflow-x:auto}
+.board-head,.board-row{display:flex;gap:10px;align-items:center}
+.board-head{font-family:var(--font-display);font-size:10px;color:#8d9288;margin-bottom:8px;padding-bottom:6px;border-bottom:2px dotted #2c2e29}
+.board-row{padding:4px 0;color:#eceee6;text-decoration:none}
+a.board-row:hover{text-decoration:none;background:#16180f}
+a.board-row:hover .flap{background:#22261c}
+.col-f{width:calc(5 * 19px)}.col-d{width:calc(12 * 19px)}.col-s{width:calc(9 * 19px)}
+.flaps{display:flex;gap:2px}
+.flap{position:relative;width:17px;height:24px;display:grid;place-items:center;background:#1b1d19;font-family:var(--font-mono);font-weight:600;font-size:15px;line-height:1;color:#eceee6}
+.flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#0a0a09}
+.st-cancel .flap{color:#d97757}.st-cancel.blink .flap{animation:flapblink 1.2s steps(1) infinite}
+.st-go .flap{color:#5ce483}.st-time .flap{color:#6fb7ff}
+@keyframes flapblink{50%{color:#4a2a1f}}
+@media (max-width:640px){
+  .flap{width:11px;height:17px;font-size:10px}
+  .col-f{width:calc(5 * 13px)}.col-d{width:calc(8 * 13px)}.col-s{width:calc(9 * 13px)}
+  .board{padding:10px}
+  .board-head,.board-row{gap:6px}
+}
+</style>
+
+<div class="fourohfour">
+  <p class="eyebrow">nav fault &middot; 404</p>
+  {% include pixel-title.liquid text=page.title %}
+  <p class="sub">This page isn't on the board. It's somewhere in a holding pattern above the clouds.</p>
+
+  <p class="hint">psst. click the 404.</p>
+  <div class="stage">
+    <canvas id="crash" aria-label="404, built from pixel blocks. Click to knock it down." role="img"></canvas>
+  </div>
+
+  <div class="board" role="table" aria-label="Departures">
+    <div class="board-head" role="row"><span class="col-f">flight</span><span class="col-d">destination</span><span class="col-s">status</span></div>
+    <div class="board-row" role="row"><span class="col-f flaps" data-text="MA404"></span><span class="col-d flaps" data-text="" id="lost-path"></span><span class="col-s flaps st-cancel" data-text="CANCELLED"></span></div>
+    <a class="board-row" role="row" href="{{ '/' | relative_url }}"><span class="col-f flaps" data-text="MA001"></span><span class="col-d flaps" data-text="HOME"></span><span class="col-s flaps st-go" data-text="BOARDING"></span></a>
+    <a class="board-row" role="row" href="{{ '/cv/' | relative_url }}"><span class="col-f flaps" data-text="MA002"></span><span class="col-d flaps" data-text="CV"></span><span class="col-s flaps st-time" data-text="ON TIME"></span></a>
+    <a class="board-row" role="row" href="https://books.mikhail.codes"><span class="col-f flaps" data-text="MA003"></span><span class="col-d flaps" data-text="BOOKS"></span><span class="col-s flaps st-time" data-text="ON TIME"></span></a>
+  </div>
+
+  <p><a class="btn" href="{{ '/' | relative_url }}">return to base &rarr;</a></p>
+</div>
+
+<script data-cfasync="false">
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+
+  // ---------- split-flap board ----------
+  var narrow = matchMedia('(max-width: 640px)').matches;
+  var lost = (location.pathname.replace(/\/+$/, '') || '/').toUpperCase();
+  var dw = narrow ? 8 : 12;
+  if (lost.length > dw) lost = lost.slice(0, dw - 1) + '~';
+  document.getElementById('lost-path').setAttribute('data-text', lost);
+  var GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-';
+  var widths = {'col-f': 5, 'col-d': dw, 'col-s': 9};
+  var cells = [];
+  document.querySelectorAll('.flaps').forEach(function (el, row) {
+    var w = widths[el.classList[0]], text = el.getAttribute('data-text');
+    for (var i = 0; i < w; i++) {
+      var f = document.createElement('span');
+      f.className = 'flap';
+      var target = text[i] || ' ';
+      f.textContent = reduce ? target : ' ';
+      el.appendChild(f);
+      // settle left to right, row by row
+      cells.push({el: f, target: target, settleAt: 10 + i * 2 + row * 4 + (Math.random() * 4 | 0)});
+    }
+  });
+  if (!reduce) {
+    var tick = 0, flapTimer = setInterval(function () {
+      tick++;
+      var busy = false;
+      cells.forEach(function (c) {
+        if (tick >= c.settleAt) { c.el.textContent = c.target; return; }
+        busy = true;
+        if (tick % 2 === 0) c.el.textContent = GLYPHS[Math.random() * GLYPHS.length | 0];
+      });
+      if (!busy) {
+        clearInterval(flapTimer);
+        document.querySelector('.st-cancel').classList.add('blink');
+      }
+    }, 45);
+  } else {
+    document.querySelector('.st-cancel').classList.add('blink');
+  }
+
+  // ---------- the 404: blocks that assemble, scatter, explode and rebuild ----------
+  var c = document.getElementById('crash'), x = c.getContext('2d');
+  var GLYPH = {
+    '4': ['...#.', '..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.'],
+    '0': ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.']
+  };
+  var TONES = [['--role-active', '--role-active-deep'], ['--role-highlight', '--hard-shadow'], ['--role-data', '--hard-shadow']];
+  var W, H, B, floorY, blocks = [], mouse = {x: -999, y: -999}, exploded = false, rebuildAt = 0, pal = {};
+  var stal = [];
+
+  function loadPal() {
+    ['--role-active', '--role-active-deep', '--role-highlight', '--role-data', '--hard-shadow', '--border', '--surface-raised', '--ink']
+      .forEach(function (n) { pal[n] = css(n); });
+    pal.ground2 = css('--stripe-b');
+  }
+
+  function layout() {
+    var dpr = devicePixelRatio || 1;
+    W = c.clientWidth;
+    B = Math.max(8, Math.min(32, Math.floor((W - 32) / 19 / 4) * 4));
+    var glyphH = 7 * B, top = 3 * B;
+    floorY = top + glyphH + 2 * B;
+    H = floorY + 24 + 72;
+    c.width = W * dpr; c.height = H * dpr; c.style.height = H + 'px';
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var ox = Math.round((W - 19 * B) / 2);
+    var targets = [];
+    '404'.split('').forEach(function (ch, gi) {
+      GLYPH[ch].forEach(function (row, r) {
+        row.split('').forEach(function (cell, col) {
+          if (cell === '#') targets.push({tx: ox + (gi * 7 + col) * B, ty: top + r * B, tone: TONES[gi]});
+        });
+      });
+    });
+    var fresh = !blocks.length;
+    blocks = targets.map(function (t, i) {
+      var old = blocks[i];
+      return {
+        tx: t.tx, ty: t.ty, tone: t.tone,
+        x: old ? old.x : t.tx + (Math.random() - .5) * 200,
+        y: old ? old.y : -B - Math.random() * 400,
+        vx: 0, vy: 0, delay: fresh ? i * 2 : 0
+      };
+    });
+    // stalactites under the ground strip
+    stal = [];
+    for (var col = 0; col < Math.ceil(W / 8);) {
+      var w = 2 + (Math.random() * 5 | 0), peak = 2 + (Math.random() * 6 | 0);
+      for (var j = 0; j < w; j++) {
+        var t = 1 - Math.abs(j - (w - 1) / 2) / (w / 2 + .5);
+        stal[col + j] = Math.max(1, Math.round(peak * t));
+      }
+      col += w + 1 + (Math.random() * 6 | 0);
+    }
+    if (reduce) blocks.forEach(function (b) { b.x = b.tx; b.y = b.ty; });
+  }
+
+  function explode(px, py) {
+    exploded = true;
+    rebuildAt = performance.now() + 2600;
+    blocks.forEach(function (b) {
+      var dx = b.x + B / 2 - px, dy = b.y + B / 2 - py, d = Math.max(20, Math.hypot(dx, dy));
+      b.vx = dx / d * (8 + Math.random() * 10) + (Math.random() - .5) * 4;
+      b.vy = dy / d * (8 + Math.random() * 10) - 6 - Math.random() * 6;
+      b.delay = 0;
+    });
+  }
+
+  // the plane flies a holding pattern (an ellipse) around the digits:
+  // behind the 404 on the far half of the orbit, in front on the near half
+  var SPRITE = [
+    'TTT.........................', 'TTTT........................', '.TTTT.......................',
+    '.TTTTT......................', '..TTTTFFFFFFFFFFFFFFFFFFF...', '..FFFFFoFoFoFoFoFoFoFoFFKKF.',
+    '..FFFFFFFFFFFFFFFFFFFFFFFFFF', '...SSSSSSSSSSSSSSSSSSSSSSSS.', '....BBBBBBBBBBBBBBBBBBBBBB..',
+    '..........WWWWWWWWW.........', '............WEEEEW..........', '..............EE............'
+  ];
+  var SPAL = {T: '#d97757', F: '#eceee6', o: '#2c2e29', K: '#6fb7ff', S: '#5ce483', B: '#c4c8bc', W: '#8d9288', E: '#5d6159'};
+  var plane = document.createElement('canvas');
+  plane.width = 84; plane.height = 36;
+  var px2 = plane.getContext('2d');
+  SPRITE.forEach(function (row, yy) {
+    row.split('').forEach(function (ch, xx) { if (SPAL[ch]) { px2.fillStyle = SPAL[ch]; px2.fillRect(xx * 3, yy * 3, 3, 3); } });
+  });
+  var angle = Math.PI * 0.9;
+
+  function drawPlane(front) {
+    var cx = W / 2, cy = 3 * B + 3.5 * B, rx = Math.min(W / 2 - 50, 11 * B), ry = 5.2 * B;
+    var s = Math.sin(angle), isFront = s > 0;
+    if (isFront !== front) return;
+    var px = Math.round((cx + rx * Math.cos(angle)) / 3) * 3, py = Math.round((cy + ry * s) / 3) * 3;
+    var dir = -Math.sin(angle); // x velocity sign
+    var scale = front ? 1 : 0.7;
+    x.save();
+    x.globalAlpha = front ? 1 : 0.55;
+    x.translate(px, py);
+    x.scale(dir < 0 ? -scale : scale, scale);
+    x.imageSmoothingEnabled = false;
+    x.drawImage(plane, -42, -18);
+    x.restore();
+  }
+
+  function drawBlock(b) {
+    var bx = Math.round(b.x), by = Math.round(b.y), e = Math.max(2, B / 8 | 0);
+    x.fillStyle = pal[b.tone[0]];
+    x.fillRect(bx, by, B, B);
+    x.fillStyle = pal[b.tone[1]];
+    x.fillRect(bx, by + B - e, B, e);
+    x.fillRect(bx + B - e, by, e, B);
+  }
+
+  function drawGround() {
+    for (var gx = 0, i = 0; gx < W; gx += 24, i++) {
+      x.fillStyle = i % 2 ? pal.ground2 : pal['--border'];
+      x.fillRect(gx, floorY, 24, 24);
+    }
+    x.fillStyle = pal['--role-active-deep'];
+    x.fillRect(0, floorY - 6, W, 6);
+    stal.forEach(function (h, i) {
+      if (!h) return;
+      x.fillStyle = pal['--border'];
+      x.fillRect(i * 8, floorY + 24, 8, (h - 1) * 8);
+      x.fillStyle = pal.ground2;
+      x.fillRect(i * 8, floorY + 24 + (h - 1) * 8, 8, 8);
+    });
+  }
+
+  function frame(now) {
+    if (exploded && now > rebuildAt) exploded = false;
+    blocks.forEach(function (b) {
+      if (b.delay > 0) { b.delay--; return; }
+      if (exploded) {
+        b.vy += 0.7; b.vx *= 0.99;
+        b.x += b.vx; b.y += b.vy;
+        if (b.y > floorY - B - 6) { b.y = floorY - B - 6; b.vy *= -0.35; b.vx *= 0.8; }
+        if (b.x < 0) { b.x = 0; b.vx *= -0.5; }
+        if (b.x > W - B) { b.x = W - B; b.vx *= -0.5; }
+      } else {
+        // spring home, pushed away by the cursor
+        var dx = b.x + B / 2 - mouse.x, dy = b.y + B / 2 - mouse.y, d = Math.hypot(dx, dy), R = B * 3;
+        if (d < R && d > 0) { b.vx += dx / d * (R - d) * 0.06; b.vy += dy / d * (R - d) * 0.06; }
+        b.vx = (b.vx + (b.tx - b.x) * 0.07) * 0.8;
+        b.vy = (b.vy + (b.ty - b.y) * 0.07) * 0.8;
+        b.x += b.vx; b.y += b.vy;
+      }
+    });
+    x.clearRect(0, 0, W, H);
+    drawGround();
+    drawPlane(false);
+    blocks.forEach(function (b) { if (b.delay <= 0 || reduce) drawBlock(b); });
+    drawPlane(true);
+    angle += 0.006;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  c.addEventListener('mousemove', function (e) { var r = c.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  c.addEventListener('mouseleave', function () { mouse.x = mouse.y = -999; });
+  c.addEventListener('click', function (e) {
+    var r = c.getBoundingClientRect();
+    explode(e.clientX - r.left, e.clientY - r.top);
+    if (reduce) { exploded = false; }
+  });
+  // phones fire resize when the address bar shows/hides; only re-lay-out on a real width change
+  addEventListener('resize', function () { if (c.clientWidth === W) return; layout(); if (reduce) frame(performance.now()); });
+  new MutationObserver(function () { loadPal(); if (reduce) frame(performance.now()); })
+    .observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+  loadPal(); layout();
+  requestAnimationFrame(frame);
+})();
+</script>
