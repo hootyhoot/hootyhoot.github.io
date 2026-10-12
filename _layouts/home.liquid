@@ -41,6 +41,8 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:"Silkscreen",monospace;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
 img{image-rendering:pixelated}
+/* night sky behind the whole page (assets/js/sky.js): stars + shooting stars in dark mode */
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 .mono{font-family:"JetBrains Mono",monospace}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
 section{position:relative;padding:120px 0 40px}
@@ -191,6 +193,7 @@ header nav a:hover{color:var(--build)}
 </style>
 </head>
 <body>
+<canvas id="sky" data-clouds="off" aria-hidden="true"></canvas>
 
 <header>
   <a class="name" href="#">Mikhail Armanuel</a>
@@ -206,7 +209,7 @@ header nav a:hover{color:var(--build)}
 </header>
 
 <section class="hero" id="top">
-  <canvas id="sky"></canvas>
+  <canvas id="hero-sky"></canvas>
   <div class="wrap">
     <h1 aria-label="Mikhail Armanuel" id="title"></h1>
     <p class="hint">psst. click the letters.</p>
@@ -378,7 +381,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
 
 // ---------- hero sky: drifting pixel clouds + blocks that fall and pile on the ground ----------
 (() => {
-  const c = document.getElementById('sky'), x = c.getContext('2d');
+  const c = document.getElementById('hero-sky'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const P = 8, tones = ['build', 'agent', 'sky', 'ink'];
   const deep = {build: '--build-deep', agent: '--agent-deep', sky: '--sky-deep', ink: '--muted'};
@@ -649,5 +652,6 @@ new IntersectionObserver((es, o) => es.forEach(e => {
   })();
 })();
 </script>
+<script src="/assets/js/sky.js?v={{ site.time | date: '%s' }}" data-cfasync="false" defer></script>
 </body>
 </html>
