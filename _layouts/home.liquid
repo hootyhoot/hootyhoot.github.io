@@ -23,6 +23,7 @@
   --surface-2:#1b1d19; --cloud:#1a1c18; --ground-2:#232520; --ground-top:#3a8f53;
   --build-deep:#1f6b37; --agent-deep:#8f4d36; --sky-deep:#3e6f9e; --amber:#e5c07b;
   --g0:#1b1d19; --g1:#1f5a33; --g2:#2f8a4c; --g3:#45b96a; --g4:#5ce483;
+  --stripe-a:#141512; --stripe-b:#1b1d19;
   color-scheme:dark;
 }
 :root[data-theme="light"]{
@@ -32,6 +33,7 @@
   --surface-2:#eae2c8; --cloud:#e6dec4; --ground-2:#ddd3b3; --ground-top:#2f8a4c;
   --build-deep:#1f5a33; --agent-deep:#7a3a24; --sky-deep:#1d4a60; --amber:#b8862b;
   --g0:#e4dcc1; --g1:#b5dfb9; --g2:#7cc48a; --g3:#45a35e; --g4:#2b7a41;
+  --stripe-a:#eae2c8; --stripe-b:#fffbf0;
   color-scheme:light;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -170,7 +172,9 @@ header nav a:hover{color:var(--build)}
 .chip{font-family:"Silkscreen",monospace;font-size:11px;background:var(--shadow);color:var(--ink);border:0;padding:8px 12px;cursor:pointer}
 .chip:hover{background:var(--build);color:var(--bg)}
 
-footer{padding:80px 0 40px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+/* striped pixel ground, same as books.mikhail.codes' footer */
+.site-footer{margin-top:80px;padding:24px 0;border-top:6px solid var(--build-deep);background:repeating-linear-gradient(90deg,var(--stripe-a) 0 24px,var(--stripe-b) 24px 48px)}
+.site-footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:11px;color:var(--muted)}
 
 /* companion plane */
 #plane{position:fixed;z-index:30;pointer-events:none;left:0;top:0;transform-origin:center;filter:drop-shadow(3px 3px 0 var(--shadow))}
@@ -319,8 +323,11 @@ footer{padding:80px 0 40px;font-size:12px;color:var(--muted);display:flex;justif
       </div>
     </div>
   </div>
-  <footer><span>Built block by block. © {{ 'now' | date: '%Y' }} Mikhail Armanuel</span><span>mikhail.codes</span></footer>
 </div></section>
+
+<footer class="site-footer"><div class="wrap">
+  <span>Built block by block. © {{ 'now' | date: '%Y' }} Mikhail Armanuel</span><span>mikhail.codes</span>
+</div></footer>
 
 <canvas id="plane" width="84" height="36"></canvas>
 <span class="bubble" id="bubble"></span>
