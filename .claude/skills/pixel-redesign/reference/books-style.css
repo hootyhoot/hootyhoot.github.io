@@ -1,0 +1,631 @@
+/* -----------------------------------------------------------------------
+   Design tokens - matches mikhail.codes' pixel/block system: Silkscreen
+   display type, square corners, hard offset shadows instead of glows
+   ----------------------------------------------------------------------- */
+
+:root {
+  --bg: #0c0d0b;
+  --surface: #141512;
+  --surface-raised: #1b1d19;
+  --border: #2c2e29;
+  --hard-shadow: #2c2e29;
+
+  --ink: #eceee6;
+  --ink-muted: #8d9288;
+
+  --role-data: #6fb7ff;
+  --role-active: #5ce483;
+  --role-active-deep: #1f6b37;
+  --role-highlight: #d97757;
+
+  --shelf-wood: #6b4d31;
+  --shelf-wood-edge: #8a6640;
+  --shelf-shadow: rgba(0, 0, 0, .45);
+  --cloud: #1a1c18;
+
+  --font-display: "Silkscreen", monospace;
+  --font-body: "JetBrains Mono", monospace;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius: 0;
+  --max-width: 1240px;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f3eedd;
+  --surface: #eae2c8;
+  --surface-raised: #fffbf0;
+  --border: #b8a97c;
+  --ink: #2b2418;
+  --ink-muted: #6b6046;
+  --role-data: #2e6e8e;
+  --role-active: #3f7d4a;
+  --role-highlight: #a6447a;
+  --shelf-wood: #8a6640;
+  --shelf-wood-edge: #a9824f;
+  --shelf-shadow: rgba(43, 36, 24, .35);
+  --cloud: #e6dec4;
+  --hard-shadow: #c9bc93;
+  --role-active-deep: #23502b;
+  color-scheme: light;
+}
+
+
+/* -----------------------------------------------------------------------
+   Base
+   ----------------------------------------------------------------------- */
+
+* , *::before, *::after { box-sizing: border-box; }
+
+/* A stray sticky-hover state on mobile (tapping a link can leave :hover
+   applied until you tap elsewhere) could register as real scrollable
+   width without this, letting the page pan/zoom sideways. */
+html { overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+img { max-width: 100%; display: block; }
+
+/* Pixel-cloud sky (static/js/sky.js) sits behind everything */
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+main, .site-footer { position: relative; z-index: 1; }
+
+a { color: var(--role-data); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: .02em;
+  line-height: 1.1;
+  margin: 0 0 .5em;
+  color: var(--ink);
+}
+
+h1 { font-size: clamp(2.2rem, 7vw, 4.6rem); }
+h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); }
+h3 { font-size: 1rem; letter-spacing: .04em; }
+
+p { margin: 0 0 1em; }
+
+::selection { background: var(--role-data); color: var(--bg); }
+:focus-visible { outline: 2px solid var(--role-data); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * , *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   Layout
+   ----------------------------------------------------------------------- */
+
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
+main { display: block; padding: 2.5rem 0 5rem; }
+
+/* Header mirrors mikhail.codes' nav: name on the left, plain pixel-font
+   links on the right (current page in green), square block theme button */
+.site-header { position: sticky; top: 0; z-index: 50; background: var(--bg); border-bottom: 2px solid var(--border); }
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 20px 32px;
+}
+
+.nav-name { font-family: var(--font-display); font-size: 15px; color: var(--ink); white-space: nowrap; }
+.nav-name:hover { text-decoration: none; color: var(--role-active); }
+
+.nav-panel { display: flex; align-items: center; gap: 28px; }
+
+.nav-btn {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  line-height: 1;
+}
+.nav-btn:hover { text-decoration: none; color: var(--role-active); }
+.nav-btn[aria-current="page"] { color: var(--role-active); }
+
+.theme-toggle {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--hard-shadow);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0;
+  transition: transform .08s steps(2), box-shadow .08s steps(2);
+}
+.theme-toggle:hover { border-color: var(--role-active); }
+.theme-toggle:active { transform: translate(3px, 3px); box-shadow: none; }
+.theme-toggle svg { width: 16px; height: 16px; shape-rendering: crispEdges; }
+.theme-toggle .icon-moon { display: none; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+/* Pixel "ground" strip, same as the bottom of mikhail.codes' hero */
+.site-footer {
+  padding: 1.5rem 0;
+  border-top: 6px solid var(--role-active-deep);
+  background: repeating-linear-gradient(90deg, var(--surface) 0 24px, var(--surface-raised) 24px 48px);
+}
+.site-footer .container {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+  font-family: var(--font-display); font-size: .7rem; color: var(--ink-muted);
+}
+
+@media (max-width: 600px) {
+  .navbar { padding: 16px 18px; }
+  .nav-name { display: none; }
+  .nav-panel { width: 100%; justify-content: space-between; gap: 12px; }
+  .nav-btn { font-size: 11px; }
+}
+
+/* -----------------------------------------------------------------------
+   Shared bits
+   ----------------------------------------------------------------------- */
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .08em;
+  color: var(--role-highlight);
+  margin-bottom: .6rem;
+}
+
+.tag-list { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; }
+.tag {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .18rem .45rem;
+  background: var(--surface);
+}
+.tag--mood { color: var(--role-highlight); border-color: var(--role-highlight); }
+
+/* Shared pixel box treatment: square edge + offset block shadow */
+.hero-stats, .panel, .book-result, .potential-match, .help-text {
+  box-shadow: 6px 6px 0 var(--hard-shadow);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-family: var(--font-display);
+  font-size: .72rem;
+  letter-spacing: .04em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .55rem .9rem;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--role-data); color: var(--role-data); text-decoration: none; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* -----------------------------------------------------------------------
+   Showcase page
+   ----------------------------------------------------------------------- */
+
+.hero { margin-bottom: 2.5rem; text-align: center; }
+
+/* Same drop-in-then-bob letters as mikhail.codes' hero name */
+.pixel-title { display: flex; justify-content: center; flex-wrap: wrap; margin: 1rem 0 .4rem; user-select: none; }
+.pixel-title span {
+  display: inline-block;
+  --d: calc(var(--i) * 70ms + 100ms);
+  opacity: 0;
+  animation: drop .5s steps(6) var(--d) forwards, bob 1.8s steps(6) calc(var(--d) + .6s + var(--i) * 40ms) infinite;
+}
+.pixel-title span:nth-child(3n+1) { color: var(--role-active); }
+@keyframes drop { from { opacity: 0; transform: translateY(-80px); } to { opacity: 1; transform: none; } }
+@keyframes bob { 0%, 100% { opacity: 1; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-8px); } }
+.hero-sub { font-size: .85rem; color: var(--ink-muted); margin: 0; }
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  margin-top: 1.75rem;
+}
+.hero-stat { display: flex; flex-direction: column; align-items: center; gap: .15rem; text-align: center; }
+.hero-stat-value { font-family: var(--font-display); font-size: 1.8rem; color: var(--role-active); line-height: 1; }
+.hero-stat-label { font-family: var(--font-display); font-size: .62rem; color: var(--ink-muted); letter-spacing: .06em; }
+
+.section-heading { display: flex; align-items: baseline; justify-content: center; gap: 1rem; margin: 2.5rem 0 1rem; }
+.section-heading:first-of-type { margin-top: 0; }
+.section-heading h2 { margin: 0; display: inline-flex; align-items: center; gap: .6rem; }
+.section-heading h2::before { content: ""; width: .6em; height: .6em; background: var(--role-active); box-shadow: 3px 3px 0 var(--hard-shadow); flex: 0 0 auto; }
+.section-count { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-muted); white-space: nowrap; }
+
+.currently-reading-panel {
+  display: flex;
+  gap: 1.25rem;
+  border: 1px solid var(--role-active);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: 6px 6px 0 var(--role-active-deep);
+}
+/* Sized from the book's real cover_ratio (fixed height, width follows)
+   instead of a forced 2:3 box - a forced ratio with object-fit:cover
+   crops the sides off anything narrower/taller than 2:3. */
+.currently-reading-panel .cover { flex: 0 0 auto; height: 130px; width: calc(130px * var(--ratio, .667)); border-radius: 2px; overflow: hidden; background: var(--surface-raised); border: 1px solid var(--border); }
+.currently-reading-panel .cover img { width: 100%; height: 100%; object-fit: cover; }
+.currently-reading-panel .info { min-width: 0; }
+.currently-reading-panel .book-title { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; margin: 0 0 .2rem; color: var(--ink); }
+.currently-reading-panel .book-author { font-size: .9rem; color: var(--ink-muted); margin: 0 0 .6rem; }
+
+.empty-state { color: var(--ink-muted); font-family: var(--font-mono); font-size: .85rem; }
+
+/* Favorites: unlike the spine shelves below, these always show the full
+   front cover (no spine crop, no hover reveal, no caption - just the
+   covers) with noticeably wider gaps between books - closer to how
+   StoryGraph's own favorites row reads, a small showcased set rather
+   than a packed shelf. Cover widths vary per book (real aspect ratio),
+   so unlike the uniform-width spine shelves this centers via plain flex
+   justify-content - fine at showcase scale, and wraps automatically as
+   more favorites get added. Still sits on the same wood ledge for
+   visual consistency with the rest of the page. */
+.favorites-shelf {
+  --fav-h: 220px;
+  --fav-gap: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  column-gap: var(--fav-gap);
+  row-gap: var(--fav-gap);
+  margin-top: 4px;
+  /* Bottom padding reserves room for the ledge band itself - background
+     is clipped to this box's own height, so without it the wood/shadow
+     stops (which start right at the row's bottom edge) render entirely
+     outside the box and never show up at all. */
+  padding: 0 14px 20px;
+  background-origin: content-box;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--fav-h),
+    var(--shelf-wood-edge) var(--fav-h),
+    var(--shelf-wood) calc(var(--fav-h) + 3px),
+    var(--shelf-wood) calc(var(--fav-h) + 12px),
+    var(--shelf-shadow) calc(var(--fav-h) + 12px),
+    var(--shelf-shadow) calc(var(--fav-h) + 16px),
+    transparent calc(var(--fav-h) + 16px),
+    transparent calc(var(--fav-h) + var(--fav-gap))
+  );
+  background-size: 100% calc(var(--fav-h) + var(--fav-gap));
+  background-repeat: repeat-y;
+}
+
+.favorite-book {
+  position: relative;
+  display: block;
+  width: calc(var(--fav-h) * var(--ratio, .667));
+  color: var(--ink);
+}
+.favorite-book:hover { text-decoration: none; }
+.favorite-book .spine-caption { width: calc(var(--fav-h) * var(--ratio, .667)); }
+.favorite-book .cover {
+  display: block;
+  height: var(--fav-h);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 5px 5px 0 var(--shelf-shadow);
+  transition: transform .12s steps(3), border-color .12s steps(2), box-shadow .12s steps(3);
+}
+.favorite-book:hover .cover, .favorite-book.touch-open .cover { transform: translate(-3px, -6px); border-color: var(--role-highlight); box-shadow: 8px 11px 0 var(--shelf-shadow); }
+.favorite-book .cover img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 500px) {
+  .favorites-shelf { --fav-h: 150px; --fav-gap: 22px; }
+}
+
+/* Bookshelf: real spines (a genuine narrow slice of each book's own cover
+   art, via object-fit:cover in an overflow:hidden box, with the title set
+   vertically over it like real spine typography) stand packed edge to edge
+   on a wooden ledge that repeats behind every wrapped row. On hover the
+   spine widens and swings out from a bottom-left pivot - the same
+   transform-origin/rotate/translate/box-shadow technique classic CSS
+   "pull book off shelf" effects use (e.g. steveworkman.com's CSS3
+   Bookshelf) - revealing more of that same image as it grows, so the
+   full cover is literally the spine's own art, not a swapped-in asset. */
+.shelf {
+  --spine-h: 200px;
+  --spine-w: 40px;
+  --spine-gap: 44px;
+  /* Grid, not flex: with a uniform fixed column width, auto-fill
+     computes exactly how many columns fit and justify-content:center
+     centers that whole block of tracks - each row still fills
+     left-to-right in normal order, so a partial last row sits at the
+     left edge of the centered block instead of being centered on its
+     own (which flex's justify-content:center would do per row). */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--spine-w));
+  justify-content: center;
+  align-content: end;
+  column-gap: 3px;
+  row-gap: var(--spine-gap);
+  /* Bottom padding is room for the last row's hover pull-out + caption;
+     top room comes from the wrapper's margin below, not padding here,
+     since padding would sit inside this box's own background-painted
+     area and the repeating ledge pattern would bleed upward into it. */
+  padding: 0 0 48px;
+  margin-top: 22px;
+  /* Ledge sits flush against the book bottoms (no gap) and reads wood-
+     first, shadow-second - the plank itself is what your eye hits right
+     under the books, and its underside casts a shadow into the space
+     below it, not the other way around. */
+  background-origin: content-box;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--spine-h),
+    var(--shelf-wood-edge) var(--spine-h),
+    var(--shelf-wood) calc(var(--spine-h) + 3px),
+    var(--shelf-wood) calc(var(--spine-h) + 12px),
+    var(--shelf-shadow) calc(var(--spine-h) + 12px),
+    var(--shelf-shadow) calc(var(--spine-h) + 16px),
+    transparent calc(var(--spine-h) + 16px),
+    transparent calc(var(--spine-h) + var(--spine-gap))
+  );
+  background-size: 100% calc(var(--spine-h) + var(--spine-gap));
+  background-repeat: repeat-y;
+}
+
+.book-spine {
+  position: relative;
+  width: var(--spine-w);
+  height: var(--spine-h);
+}
+.book-spine:hover, .book-spine:focus-visible { text-decoration: none; outline: none; }
+
+.spine-body {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--spine-w);
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2px 3px 1px 1px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.25);
+  transform-origin: left bottom;
+  transition: width .32s cubic-bezier(.22,1,.36,1), transform .32s cubic-bezier(.22,1,.36,1), box-shadow .32s ease;
+  z-index: 1;
+}
+/* Hover width is derived from the book's real cover_ratio (--ratio, set
+   inline per book from storygraph_scraper's _cover_meta) so the box's
+   aspect ratio matches the image exactly - object-fit:cover then shows
+   the whole cover with zero crop instead of forcing a fixed 2:3 frame
+   that clips tall or wide covers. */
+.book-spine:hover .spine-body, .book-spine:focus-visible .spine-body, .book-spine.touch-open .spine-body {
+  width: calc(var(--spine-h) * var(--ratio, .667));
+  transform: rotate(-4deg) translateY(-10px);
+  box-shadow: 0 18px 30px -10px rgba(0,0,0,.6);
+  z-index: 30;
+}
+
+.spine-body img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.spine-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity .2s ease;
+}
+.book-spine:hover .spine-title, .book-spine:focus-visible .spine-title, .book-spine.touch-open .spine-title { opacity: 0; }
+
+/* Text color/scrim picked per-book from the actual sampled luminance of
+   the cover strip underneath (see spine_text_color in
+   storygraph_scraper.py), not a fixed color that fights busy covers. */
+.spine-title--light {
+  color: #f2f2f0;
+  text-shadow: 0 1px 3px rgba(0,0,0,.85);
+  background: linear-gradient(to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5));
+}
+.spine-title--dark {
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255,255,255,.7);
+  background: linear-gradient(to bottom, rgba(255,255,255,.1), rgba(255,255,255,.5));
+}
+
+/* Solid panel, not bare text over whatever's underneath - the row below
+   is often another busy cover, and pale/ink-muted text on top of that
+   was unreadable. */
+.spine-caption {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: calc(var(--spine-h) * var(--ratio, .667));
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .4rem .55rem;
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  line-height: 1.3;
+  color: var(--ink-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease .08s;
+  /* High enough to stay above every other section on the page, not just
+     its own row - it's positioned outside .favorite-book's own box once
+     it pops out, and shouldn't get buried under later content. */
+  z-index: 999;
+}
+.spine-caption strong { display: block; color: var(--ink); font-family: var(--font-display); font-weight: 400; margin-bottom: .15rem; }
+.book-spine:hover .spine-caption, .book-spine:focus-visible .spine-caption, .book-spine.touch-open .spine-caption,
+.favorite-book:hover .spine-caption, .favorite-book:focus-visible .spine-caption, .favorite-book.touch-open .spine-caption { opacity: 1; }
+
+@media (max-width: 500px) {
+  .shelf { --spine-h: 140px; --spine-w: 26px; --spine-gap: 46px; }
+}
+
+/* Collapsible shelves */
+.section-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+.section-toggle:hover h2 { color: var(--role-data); }
+.section-toggle .heading-left { display: flex; align-items: baseline; gap: .6rem; }
+.section-toggle .chevron { transition: transform .25s ease; color: var(--ink-muted); flex: 0 0 auto; }
+.section-toggle[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+.shelf-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .4s cubic-bezier(.4,0,.2,1);
+}
+.shelf-wrap[data-open="true"] { grid-template-rows: 1fr; }
+/* overflow:hidden (not clip-path) is required here for two reasons: it's
+   what actually hides the collapsed content, and - less obviously - it's
+   also what lets min-height:0 take effect at all. A CSS grid item's
+   automatic minimum size normally floors it at its content's natural
+   height regardless of the 0fr track size, and that floor is only
+   suppressed when the item's overflow is something other than visible.
+   clip-path doesn't count for that, so the "the pile" section, while
+   collapsed, was still reserving its full expanded height below the
+   fold even though nothing was visible there. */
+.shelf-wrap-inner { overflow: hidden; min-height: 0; }
+
+/* -----------------------------------------------------------------------
+   Recommender page
+   ----------------------------------------------------------------------- */
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+#query-form { display: flex; flex-direction: column; gap: .9rem; margin-top: 1.25rem; }
+
+select, input[type="text"] {
+  padding: .7rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .95rem;
+  font-family: var(--font-body);
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+select:focus, input[type="text"]:focus { outline: 2px solid var(--role-data); outline-offset: 1px; }
+
+button[type="submit"] {
+  padding: .85rem;
+  border: 0;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  letter-spacing: .04em;
+  font-size: .85rem;
+  background: var(--role-active);
+  color: var(--bg);
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--role-active-deep);
+  transition: transform .08s steps(2), box-shadow .08s steps(2);
+}
+button[type="submit"]:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 var(--role-active-deep); }
+button[type="submit"]:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--role-active-deep); }
+button[type="submit"]:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+
+#loading { display: none; font-family: var(--font-display); font-size: .85rem; color: var(--ink-muted); margin-top: 1rem; }
+
+.help-toggle { margin-top: .75rem; }
+.help-text {
+  display: none;
+  margin-top: .75rem;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  font-size: .88rem;
+  color: var(--ink-muted);
+}
+.help-text.open { display: block; }
+.help-text ul { margin: .5rem 0 0; padding-left: 1.2em; }
+
+#recommendations, #potential-matches { margin-top: 1.5rem; display: none; }
+.book-result, .potential-match {
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin-bottom: .8rem;
+}
+.potential-match { cursor: pointer; transition: border-color .1s steps(2); }
+.potential-match:hover { border-color: var(--role-data); }
+.book-result h3, .potential-match h3 { margin: 0 0 .2rem; font-size: 1rem; }
+.book-result .book-author, .potential-match .book-author { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-muted); margin: 0 0 .3rem; }
+.book-result p, .potential-match p { margin: 0; font-size: .85rem; color: var(--ink-muted); }
+
+#sort-options { display: none; margin-top: 1rem; }
+#show-more { display: none; margin-top: .5rem; width: 100%; }

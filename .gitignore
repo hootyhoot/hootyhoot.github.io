@@ -11,3 +11,8 @@ Gemfile.lock
 assets/libs/
 node_modules/
 vendor
+
+# share project skills (global gitignore excludes .claude/), keep the rest of .claude/ local
+!.claude/
+.claude/*
+!.claude/skills/
