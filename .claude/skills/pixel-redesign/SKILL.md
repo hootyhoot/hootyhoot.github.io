@@ -81,6 +81,13 @@ next to this file - read them before writing anything:
 - **Hero sky canvas:** drifting pixel clouds; blocks rain down at load and pile
   on the ground per 8px column; clicked letters throw coloured blocks that land
   in a darker shade.
+- **Night sky** (`assets/js/sky.js`, shared by every page and books): a fixed
+  `#sky` canvas behind everything. Dark mode only: mixed-size 4-pointed pixel
+  stars (45% 1px specks, 35% small, 15% medium, 5% big with a diagonal bloom)
+  whose arms step in and out as they glimmer, plus a shooting star every
+  6-15s on a 30-60 degree diagonal with a solid tapering tail. Clouds are drawn
+  after the stars so they pass in front. `data-clouds="off"` where another
+  canvas already draws clouds (the homepage hero, renamed `hero-sky`).
 - **Ground strip:** 24px checkered bar (`--shadow`/`--ground-2`) with a 6px
   green top edge, plus a **stalactite band** under it: a separate canvas below
   the hero (the hero has `overflow:hidden`) with a negative bottom margin so it
