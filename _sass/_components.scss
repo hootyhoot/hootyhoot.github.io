@@ -599,3 +599,159 @@ figure video {
 .fault-panel .eyebrow {
   color: var(--role-highlight);
 }
+
+// --- Project write-ups (page.liquid adds .writeup for the projects collection)
+// Styling only: the write-up markup/content is untouched.
+
+.read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.read-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(90deg, var(--role-active) 0 10px, transparent 10px 12px);
+}
+
+.eyebrow-link {
+  color: inherit;
+}
+
+.eyebrow-link:hover {
+  text-decoration: none;
+  color: var(--role-active);
+}
+
+.writeup {
+  // prose links: dashed pixel underline, like the homepage hero links
+  p a,
+  li a {
+    color: var(--role-data);
+    text-decoration: none;
+    border-bottom: 2px dashed currentColor;
+  }
+
+  p a:hover,
+  li a:hover {
+    color: var(--role-active);
+    text-decoration: none;
+  }
+
+  // sub-headings get the green block marker
+  h3,
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  h3::before,
+  h4::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 0.6em;
+    height: 0.6em;
+    background: var(--role-active);
+    box-shadow: 2px 2px 0 var(--hard-shadow);
+  }
+
+  .beat h4 {
+    display: block;
+    margin: 0;
+  }
+
+  .beat h4::before {
+    content: none;
+  }
+
+  // square pixel bullets
+  ul {
+    list-style: none;
+    padding-left: 1.4em;
+  }
+
+  ul li {
+    position: relative;
+    margin-bottom: 0.35rem;
+  }
+
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: -1.2em;
+    top: 0.55em;
+    width: 7px;
+    height: 7px;
+    background: var(--role-active);
+  }
+
+  // section breaks as a row of blocks
+  hr {
+    height: 6px;
+    border: 0;
+    margin: 2.5rem 0;
+    background: repeating-linear-gradient(90deg, var(--border) 0 6px, transparent 6px 14px);
+  }
+
+  // code blocks as homepage-style terminal windows
+  div.highlighter-rouge {
+    margin: 1.25rem 0;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    box-shadow: 6px 6px 0 var(--hard-shadow);
+  }
+
+  div.highlighter-rouge::before {
+    content: "";
+    display: block;
+    height: 28px;
+    border-bottom: 2px solid var(--border);
+    background:
+      linear-gradient(var(--role-highlight), var(--role-highlight)) 12px 9px / 10px 10px no-repeat,
+      linear-gradient(#e5c07b, #e5c07b) 28px 9px / 10px 10px no-repeat,
+      linear-gradient(var(--role-active), var(--role-active)) 44px 9px / 10px 10px no-repeat,
+      var(--surface-raised);
+  }
+
+  div.highlighter-rouge pre {
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.82rem;
+  }
+
+  div.highlighter-rouge .highlight {
+    background: transparent;
+  }
+
+  // inline code
+  :not(pre) > code {
+    background: var(--surface-raised);
+    color: var(--ink);
+    border: 2px solid var(--border);
+    border-radius: 0;
+  }
+
+  // syntax colours from the site palette
+  .highlight {
+    .c, .c1, .cm, .cp, .cs { color: var(--ink-muted); font-style: normal; }
+    .k, .kd, .kn, .kr, .kt, .nt { color: var(--role-active); }
+    .s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sx, .ss, .dl { color: var(--role-highlight); }
+    .m, .mi, .mf, .mo, .mh, .nb, .nc, .no { color: var(--role-data); }
+  }
+
+  figure video {
+    border: 2px solid var(--border);
+    box-shadow: 6px 6px 0 var(--hard-shadow);
+  }
+}

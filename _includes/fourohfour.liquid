@@ -8,10 +8,11 @@
 .fourohfour .eyebrow{color:var(--role-highlight)}
 .fourohfour .pixel-title{justify-content:center;margin:0 0 .4rem}
 .fourohfour .sub{color:var(--ink-muted);max-width:52ch;margin:0 auto 1.5rem}
-/* full-bleed stage so the ground runs edge to edge like the homepage hero */
-html{overflow-x:clip}
-.stage{position:relative;width:100vw;margin:0 0 1rem calc(50% - 50vw)}
-.stage canvas{display:block;width:100%;cursor:pointer}
+/* .stage reserves room for the 404 and takes the clicks; #crash is drawn over
+   the whole page (under the sticky header) so knocked-down blocks can land on
+   the departure board or on the footer. It ignores the pointer so links work. */
+.stage{position:relative;margin:0 0 1rem;cursor:pointer}
+#crash{position:absolute;top:0;left:0;z-index:40;pointer-events:none}
 .fourohfour .hint{font-family:var(--font-display);font-size:10px;color:var(--ink-muted);margin:0}
 
 /* split-flap departure board */
@@ -41,10 +42,8 @@ a.board-row:hover .flap{background:#22261c}
   {% include pixel-title.liquid text=page.title %}
   <p class="sub">This page isn't on the board. It's somewhere in a holding pattern above the clouds.</p>
 
-  <p class="hint">psst. click the 404.</p>
-  <div class="stage">
-    <canvas id="crash" aria-label="404, built from pixel blocks. Click to knock it down." role="img"></canvas>
-  </div>
+  <p class="hint" id="hint">psst. click the 404.</p>
+  <div class="stage" id="stage" role="img" aria-label="404, built from pixel blocks. Click to knock it down."></div>
 
   <div class="board" role="table" aria-label="Departures">
     <div class="board-head" role="row"><span class="col-f">flight</span><span class="col-d">destination</span><span class="col-s">status</span></div>
@@ -102,36 +101,61 @@ a.board-row:hover .flap{background:#22261c}
   }
 
   // ---------- the 404: blocks that assemble, scatter, explode and rebuild ----------
-  var c = document.getElementById('crash'), x = c.getContext('2d');
+  // runs after DOMContentLoaded: this script sits above the footer it lands blocks on
+  function crash() {
+  // #crash is moved to <body> and sized to the document, so everything here is
+  // drawn in page coordinates; .stage just reserves space and takes clicks.
+  var c = document.getElementById('crash') || document.createElement('canvas');
+  c.id = 'crash';
+  document.body.appendChild(c);
+  var x = c.getContext('2d');
+  var stage = document.getElementById('stage'), hint = document.getElementById('hint');
+  var board = document.querySelector('.board'), footer = document.querySelector('.site-footer');
   var GLYPH = {
     '4': ['...#.', '..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.'],
     '0': ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.']
   };
   var TONES = [['--role-active', '--role-active-deep'], ['--role-highlight', '--hard-shadow'], ['--role-data', '--hard-shadow']];
-  var W, H, B, floorY, blocks = [], mouse = {x: -999, y: -999}, exploded = false, rebuildAt = 0, pal = {};
-  var stal = [];
+  var W, H, B, sx, sy, blocks = [], mouse = {x: -9999, y: -9999}, exploded = false, rebuildAt = 0, pal = {};
+  var surfaces = [], piles = {};
 
   function loadPal() {
-    ['--role-active', '--role-active-deep', '--role-highlight', '--role-data', '--hard-shadow', '--border', '--surface-raised', '--ink']
+    ['--role-active', '--role-active-deep', '--role-highlight', '--role-data', '--hard-shadow']
       .forEach(function (n) { pal[n] = css(n); });
-    pal.ground2 = css('--stripe-b');
+  }
+
+  function docRect(el) {
+    var r = el.getBoundingClientRect();
+    return {left: r.left + scrollX, right: r.right + scrollX, top: r.top + scrollY, bottom: r.bottom + scrollY};
+  }
+
+  // landing surfaces in page coordinates: the top of the departure board and
+  // the top of the footer (the striped "ground" at the bottom of the page)
+  function measureSurfaces() {
+    var b = docRect(board), f = docRect(footer);
+    surfaces = [
+      {name: 'board', left: b.left, right: b.right, top: b.top},
+      {name: 'floor', left: 0, right: W, top: f.top - 6}
+    ];
   }
 
   function layout() {
     var dpr = devicePixelRatio || 1;
-    W = c.clientWidth;
+    W = document.documentElement.clientWidth;
     B = Math.max(8, Math.min(32, Math.floor((W - 32) / 19 / 4) * 4));
-    var glyphH = 7 * B, top = 3 * B;
-    floorY = top + glyphH + 2 * B;
-    H = floorY + 24 + 72;
-    c.width = W * dpr; c.height = H * dpr; c.style.height = H + 'px';
+    stage.style.height = (12 * B) + 'px';
+    var st = docRect(stage);
+    sx = Math.round((W - 19 * B) / 2); sy = st.top + 3 * B;
+    H = docRect(footer).bottom;
+    c.width = W * dpr; c.height = H * dpr;
+    c.style.width = W + 'px'; c.style.height = H + 'px';
     x.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var ox = Math.round((W - 19 * B) / 2);
+    measureSurfaces();
     var targets = [];
     '404'.split('').forEach(function (ch, gi) {
       GLYPH[ch].forEach(function (row, r) {
         row.split('').forEach(function (cell, col) {
-          if (cell === '#') targets.push({tx: ox + (gi * 7 + col) * B, ty: top + r * B, tone: TONES[gi]});
+          if (cell === '#') targets.push({tx: sx + (gi * 7 + col) * B, ty: sy + r * B, tone: TONES[gi]});
         });
       });
     });
@@ -141,32 +165,42 @@ a.board-row:hover .flap{background:#22261c}
       return {
         tx: t.tx, ty: t.ty, tone: t.tone,
         x: old ? old.x : t.tx + (Math.random() - .5) * 200,
-        y: old ? old.y : -B - Math.random() * 400,
-        vx: 0, vy: 0, delay: fresh ? i * 2 : 0
+        y: old ? old.y : sy - B - Math.random() * 400,
+        vx: 0, vy: 0, delay: fresh ? i * 2 : 0, landed: false
       };
     });
-    // stalactites under the ground strip
-    stal = [];
-    for (var col = 0; col < Math.ceil(W / 8);) {
-      var w = 2 + (Math.random() * 5 | 0), peak = 2 + (Math.random() * 6 | 0);
-      for (var j = 0; j < w; j++) {
-        var t = 1 - Math.abs(j - (w - 1) / 2) / (w / 2 + .5);
-        stal[col + j] = Math.max(1, Math.round(peak * t));
-      }
-      col += w + 1 + (Math.random() * 6 | 0);
-    }
+    if (exploded) rebuild();
     if (reduce) blocks.forEach(function (b) { b.x = b.tx; b.y = b.ty; });
   }
 
+  function rebuild() {
+    exploded = false; piles = {};
+    blocks.forEach(function (b) { b.landed = false; });
+    hint.textContent = 'psst. click the 404.';
+  }
+
   function explode(px, py) {
-    exploded = true;
-    rebuildAt = performance.now() + 2600;
+    exploded = true; piles = {};
+    rebuildAt = performance.now() + 8000;
+    measureSurfaces();
+    hint.textContent = 'click again to rebuild.';
     blocks.forEach(function (b) {
       var dx = b.x + B / 2 - px, dy = b.y + B / 2 - py, d = Math.max(20, Math.hypot(dx, dy));
-      b.vx = dx / d * (8 + Math.random() * 10) + (Math.random() - .5) * 4;
-      b.vy = dy / d * (8 + Math.random() * 10) - 6 - Math.random() * 6;
-      b.delay = 0;
+      b.vx = dx / d * (6 + Math.random() * 9) + (Math.random() - .5) * 4;
+      b.vy = dy / d * (6 + Math.random() * 9) - 8 - Math.random() * 6;
+      b.delay = 0; b.landed = false;
     });
+  }
+
+  // highest surface under this column that the block is still above
+  function landingY(b) {
+    var col = Math.round(b.x / B), cx = col * B + B / 2, best = null;
+    surfaces.forEach(function (s) {
+      if (cx < s.left || cx > s.right) return;
+      var key = s.name + ':' + col, top = s.top - B - (piles[key] || 0) * B;
+      if (b.y - b.vy <= top + 1 && (best === null || top < best.y)) best = {y: top, key: key, col: col};
+    });
+    return best;
   }
 
   // the plane flies a holding pattern (an ellipse) around the digits:
@@ -187,7 +221,7 @@ a.board-row:hover .flap{background:#22261c}
   var angle = Math.PI * 0.9;
 
   function drawPlane(front) {
-    var cx = W / 2, cy = 3 * B + 3.5 * B, rx = Math.min(W / 2 - 50, 11 * B), ry = 5.2 * B;
+    var cx = W / 2, cy = sy + 3.5 * B, rx = Math.min(W / 2 - 50, 11 * B), ry = 5.2 * B;
     var s = Math.sin(angle), isFront = s > 0;
     if (isFront !== front) return;
     var px = Math.round((cx + rx * Math.cos(angle)) / 3) * 3, py = Math.round((cy + ry * s) / 3) * 3;
@@ -211,32 +245,21 @@ a.board-row:hover .flap{background:#22261c}
     x.fillRect(bx + B - e, by, e, B);
   }
 
-  function drawGround() {
-    for (var gx = 0, i = 0; gx < W; gx += 24, i++) {
-      x.fillStyle = i % 2 ? pal.ground2 : pal['--border'];
-      x.fillRect(gx, floorY, 24, 24);
-    }
-    x.fillStyle = pal['--role-active-deep'];
-    x.fillRect(0, floorY - 6, W, 6);
-    stal.forEach(function (h, i) {
-      if (!h) return;
-      x.fillStyle = pal['--border'];
-      x.fillRect(i * 8, floorY + 24, 8, (h - 1) * 8);
-      x.fillStyle = pal.ground2;
-      x.fillRect(i * 8, floorY + 24 + (h - 1) * 8, 8, 8);
-    });
-  }
-
   function frame(now) {
-    if (exploded && now > rebuildAt) exploded = false;
+    if (exploded && now > rebuildAt) rebuild();
     blocks.forEach(function (b) {
       if (b.delay > 0) { b.delay--; return; }
       if (exploded) {
+        if (b.landed) return;
         b.vy += 0.7; b.vx *= 0.99;
         b.x += b.vx; b.y += b.vy;
-        if (b.y > floorY - B - 6) { b.y = floorY - B - 6; b.vy *= -0.35; b.vx *= 0.8; }
         if (b.x < 0) { b.x = 0; b.vx *= -0.5; }
         if (b.x > W - B) { b.x = W - B; b.vx *= -0.5; }
+        var land = b.vy > 0 && landingY(b);
+        if (land && b.y >= land.y) {
+          b.y = land.y; b.x = land.col * B; b.vx = b.vy = 0; b.landed = true;
+          piles[land.key] = (piles[land.key] || 0) + 1;
+        }
       } else {
         // spring home, pushed away by the cursor
         var dx = b.x + B / 2 - mouse.x, dy = b.y + B / 2 - mouse.y, d = Math.hypot(dx, dy), R = B * 3;
@@ -247,7 +270,6 @@ a.board-row:hover .flap{background:#22261c}
       }
     });
     x.clearRect(0, 0, W, H);
-    drawGround();
     drawPlane(false);
     blocks.forEach(function (b) { if (b.delay <= 0 || reduce) drawBlock(b); });
     drawPlane(true);
@@ -255,19 +277,28 @@ a.board-row:hover .flap{background:#22261c}
     if (!reduce) requestAnimationFrame(frame);
   }
 
-  c.addEventListener('mousemove', function (e) { var r = c.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
-  c.addEventListener('mouseleave', function () { mouse.x = mouse.y = -999; });
-  c.addEventListener('click', function (e) {
-    var r = c.getBoundingClientRect();
-    explode(e.clientX - r.left, e.clientY - r.top);
-    if (reduce) { exploded = false; }
+  stage.addEventListener('mousemove', function (e) { mouse.x = e.pageX; mouse.y = e.pageY; });
+  stage.addEventListener('mouseleave', function () { mouse.x = mouse.y = -9999; });
+  stage.addEventListener('click', function (e) {
+    if (exploded) { rebuild(); return; }
+    explode(e.pageX, e.pageY);
+    if (reduce) rebuild();
   });
   // phones fire resize when the address bar shows/hides; only re-lay-out on a real width change
-  addEventListener('resize', function () { if (c.clientWidth === W) return; layout(); if (reduce) frame(performance.now()); });
+  addEventListener('resize', function () { if (document.documentElement.clientWidth === W) return; layout(); if (reduce) frame(performance.now()); });
+  // webfonts / the board settling can shift the page; keep the canvas and surfaces in sync
+  if (window.ResizeObserver) new ResizeObserver(function () {
+    var h = docRect(footer).bottom;
+    if (Math.abs(h - H) > 1) { layout(); }
+    else { measureSurfaces(); }
+  }).observe(document.body);
   new MutationObserver(function () { loadPal(); if (reduce) frame(performance.now()); })
     .observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
 
   loadPal(); layout();
   requestAnimationFrame(frame);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', crash);
+  else crash();
 })();
 </script>

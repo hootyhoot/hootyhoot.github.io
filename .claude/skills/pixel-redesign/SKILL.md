@@ -110,10 +110,16 @@ next to this file - read them before writing anything:
   render page titles per letter, grouped per word so phones wrap between words.
 - **404** (`_includes/fourohfour.liquid`, published at `/404.html` and a
   permanent `/404/`): block-built "404" that assembles, scatters from the cursor,
-  explodes on click and rebuilds; plane in a holding pattern (behind the digits
-  on the far half of the orbit); split-flap departure board showing the lost
-  path as CANCELLED. Full-bleed ground via `width:100vw;
-  margin-left:calc(50% - 50vw)` + `html{overflow-x:clip}`. No auto-redirect.
+  and explodes on click; the blocks are drawn on a page-sized overlay canvas
+  (`pointer-events:none`, under the sticky header) so they pile up on top of the
+  departure board or the footer, and rebuild on a second click or after 8s.
+  Plane in a holding pattern (behind the digits on the far half of the orbit);
+  split-flap departure board showing the lost path as CANCELLED. Init after
+  DOMContentLoaded, since the script sits above the footer. No auto-redirect.
+- **Project write-ups** (`.writeup` in `_components.scss`): styling only, never
+  touch the content - terminal-window code blocks, block-row `hr`, square
+  bullets, marker sub-headings, dashed links, a stepped reading-progress bar
+  and a "← projects" back link.
 - **Secondary sites** (see `reference/books-style.css`): same tokens/fonts, same
   header, same footer, a `#sky` fixed canvas of drifting clouds behind content,
   a bobbing pixel title rendered per-letter by the template, and the site's own

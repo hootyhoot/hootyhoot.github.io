@@ -1,12 +1,34 @@
 ---
 layout: default
 ---
+{% if page.collection == 'projects' %}
+  {%- comment -%} pixel reading-progress bar for write-ups {%- endcomment -%}
+  <div class="read-progress" aria-hidden="true"><span id="read-progress"></span></div>
+{% endif %}
 <header class="page-header">
-  {% if page.eyebrow %}<p class="eyebrow">{{ page.eyebrow }}</p>{% endif %}
+  {% if page.collection == 'projects' %}
+    <p class="eyebrow"><a class="eyebrow-link" href="{{ '/#projects' | relative_url }}">&larr; projects</a>{% if page.category %} &middot; {{ page.category }}{% endif %}</p>
+  {% elsif page.eyebrow %}<p class="eyebrow">{{ page.eyebrow }}</p>{% endif %}
   {% include pixel-title.liquid text=page.title %}
   {% if page.description %}
     <p class="page-description{% if page.collection == 'projects' %} page-description--accent{% endif %}">{{ page.description }}</p>
   {% endif %}
 </header>
 
-<article>{{ content }}</article>
+<article{% if page.collection == 'projects' %} class="writeup"{% endif %}>{{ content }}</article>
+{% if page.collection == 'projects' %}
+<script data-cfasync="false">
+  (function () {
+    var bar = document.getElementById('read-progress');
+    function update() {
+      var max = document.documentElement.scrollHeight - innerHeight;
+      // snap to 2% steps so the bar grows in visible blocks
+      var pct = max > 0 ? Math.round(scrollY / max * 50) * 2 : 100;
+      bar.style.width = Math.min(100, pct) + '%';
+    }
+    addEventListener('scroll', update, {passive: true});
+    addEventListener('resize', update);
+    update();
+  })();
+</script>
+{% endif %}

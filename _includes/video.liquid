@@ -1,7 +1,7 @@
 <figure>
   <video
     src="{{ include.path | relative_url }}"
-    style="width:100%; height:auto; border-radius: var(--radius); border: 1px solid var(--border);"
+    style="width:100%; height:auto;"
     {% if include.autoplay %}autoplay{% endif %}
     {% if include.controls %}controls{% endif %}
     {% if include.loop %}loop{% endif %}
