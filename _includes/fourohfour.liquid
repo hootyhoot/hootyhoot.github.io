@@ -7,13 +7,12 @@
 .fourohfour{text-align:center}
 .fourohfour .eyebrow{color:var(--role-highlight)}
 .fourohfour .pixel-title{justify-content:center;margin:0 0 .4rem}
-.fourohfour .sub{color:var(--ink-muted);max-width:52ch;margin:0 auto 1.5rem}
 /* .stage reserves room for the 404 and takes the clicks; #crash is drawn over
    the whole page (under the sticky header) so knocked-down blocks can land on
    the departure board or on the footer. It ignores the pointer so links work. */
 .stage{position:relative;margin:0 0 1rem;cursor:pointer}
 #crash{position:absolute;top:0;left:0;z-index:40;pointer-events:none}
-.fourohfour .hint{font-family:var(--font-display);font-size:10px;color:var(--ink-muted);margin:0}
+.fourohfour .hint{font-family:var(--font-display);font-size:10px;color:var(--ink-muted);margin:1rem 0 0}
 
 /* split-flap departure board */
 .board{display:inline-block;text-align:left;background:#0a0a09;border:2px solid var(--border);box-shadow:6px 6px 0 var(--hard-shadow);padding:14px 16px 10px;margin:.5rem 0 2rem;max-width:100%;overflow-x:auto}
@@ -40,7 +39,6 @@ a.board-row:hover .flap{background:#22261c}
 <div class="fourohfour">
   <p class="eyebrow">nav fault &middot; 404</p>
   {% include pixel-title.liquid text=page.title %}
-  <p class="sub">This page isn't on the board. It's somewhere in a holding pattern above the clouds.</p>
 
   <p class="hint" id="hint">psst. click the 404.</p>
   <div class="stage" id="stage" role="img" aria-label="404, built from pixel blocks. Click to knock it down."></div>
