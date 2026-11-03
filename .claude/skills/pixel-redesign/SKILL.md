@@ -95,7 +95,9 @@ next to this file - read them before writing anything:
   green top edge, plus a **stalactite band** under it: a separate canvas below
   the hero (the hero has `overflow:hidden`) with a negative bottom margin so it
   overlaps the next section's padding. Random tapered stalactites, lighter tip
-  pixel, occasional fading drips.
+  pixel, occasional fading drips. Rebuild them on resize only when the width
+  changes: mobile address-bar show/hide fires resize on scroll and would
+  reshuffle them.
 - **Project cards:** grid of `.box` cards, 16:9 media well, Silkscreen title,
   mono description, coloured category tag; hover lifts with a green hard shadow.
 - **Player card (about):** portrait at its natural aspect ratio (don't force a

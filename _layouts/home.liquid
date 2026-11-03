@@ -492,7 +492,9 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     requestAnimationFrame(frame);
   }
   loadPal(); build();
-  addEventListener('resize', () => { build(); if (reduce) draw(); });
+  // phones fire resize when the address bar shows/hides on scroll; only
+  // regenerate when the width really changes, or the stalactites reshuffle
+  addEventListener('resize', () => { if (c.clientWidth === W) return; build(); if (reduce) draw(); });
   addEventListener('themechange', () => { loadPal(); if (reduce) draw(); });
   if (reduce) draw(); else frame();
 })();
