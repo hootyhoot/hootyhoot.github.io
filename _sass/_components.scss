@@ -937,8 +937,7 @@ html.viewer-open {
   max-width: none;
   border: 0;
   box-shadow: none;
-  transform-origin: center;
-  will-change: transform;
+  transform-origin: 0 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

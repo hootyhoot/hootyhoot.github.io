@@ -48,7 +48,6 @@
     // the window hugs the image (the title truncates), but never narrower than the bar's controls
     var border = win.offsetWidth - win.clientWidth;
     win.style.width = (Math.max(fitW, MIN_BAR) + border) + 'px';
-    img.style.width = fitW + 'px'; img.style.height = fitH + 'px';
     clamp(); apply();
   }
 
@@ -59,8 +58,12 @@
     ty = Math.max(-my, Math.min(my, ty));
   }
 
+  // zoom by resizing the image rather than CSS-scaling it, so the browser redraws it
+  // from the full-res file at each zoom instead of stretching the fitted-size bitmap
   function apply() {
-    img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    var w = fitW * scale, h = fitH * scale;
+    img.style.width = w + 'px'; img.style.height = h + 'px';
+    img.style.transform = 'translate(' + ((fitW - w) / 2 + tx) + 'px,' + ((fitH - h) / 2 + ty) + 'px)';
     zoomLabel.textContent = Math.round(scale * 100) + '%';
     stage.classList.toggle('is-zoomed', scale > 1);
     overlay.querySelector('.viewer-out').disabled = scale <= MIN;
