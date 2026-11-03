@@ -23,7 +23,7 @@ But the more we used it, the more it felt like the person who actually needs the
     </div>
 </div>
 <div class="figure-caption">
-    A finance internship against a made-up junior accountant's CV. 28%, ouch. The suggestions on the right are the useful part: what to add, what to reword, and why.
+    A finance internship against a made-up junior accountant's CV. 41%, a weak match. The suggestions on the right are the useful part: what to add, what to reword, and why.
 </div>
 
 Every requirement in the job ends up in one of a few buckets:
