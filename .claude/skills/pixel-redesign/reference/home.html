@@ -41,6 +41,8 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:"Silkscreen",monospace;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
 img{image-rendering:pixelated}
+/* sky behind the whole page (assets/js/sky.js): layered clouds; stars + shooting stars at night; jets + birds by day */
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 .mono{font-family:"JetBrains Mono",monospace}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
 section{position:relative;padding:120px 0 40px}
@@ -179,18 +181,14 @@ header nav a:hover{color:var(--build)}
 .site-footer{margin-top:80px;padding:24px 0;border-top:6px solid var(--build-deep);background:repeating-linear-gradient(90deg,var(--stripe-a) 0 24px,var(--stripe-b) 24px 48px)}
 .site-footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:11px;color:var(--muted)}
 
-/* companion plane */
-#plane{position:fixed;z-index:30;pointer-events:none;left:0;top:0;transform-origin:center;filter:drop-shadow(3px 3px 0 var(--shadow))}
-.bubble{position:fixed;z-index:31;font-size:11px;background:var(--ink);color:var(--bg);padding:6px 9px;pointer-events:none;opacity:0;transition:opacity .15s steps(2);white-space:nowrap}
-.bubble::after{content:"";position:absolute;left:10px;bottom:-6px;border:6px solid transparent;border-top-color:var(--ink);border-bottom:0}
 
 @media (prefers-reduced-motion:reduce){
   .hero h1 .l,.hint,.hero .line,.hero .ctas,.hero .socials{animation:none;opacity:1;transform:none}
-  #plane,.bubble{display:none}
 }
 </style>
 </head>
 <body>
+<canvas id="sky" aria-hidden="true"></canvas>
 
 <header>
   <a class="name" href="#">Mikhail Armanuel</a>
@@ -206,7 +204,7 @@ header nav a:hover{color:var(--build)}
 </header>
 
 <section class="hero" id="top">
-  <canvas id="sky"></canvas>
+  <canvas id="hero-sky"></canvas>
   <div class="wrap">
     <h1 aria-label="Mikhail Armanuel" id="title"></h1>
     <p class="hint">psst. click the letters.</p>
@@ -231,6 +229,11 @@ header nav a:hover{color:var(--build)}
 <section id="projects"><div class="wrap">
   <h2>Projects</h2>
   <div class="grid">
+    <a class="card box" href="/projects/elevra/">
+      <div class="media"><span class="glyph">[ELEVRA]</span></div>
+      <div class="body"><h3>Résumé Helper</h3><p>AI job-fit analyser for CVs, on the web and as a browser extension.</p>
+      <div class="meta"><span class="tag personal">personal</span><span>StraitsTec</span></div></div>
+    </a>
     <a class="card box" href="/asemboi/" target="_blank">
       <div class="media"><span class="glyph">[ROBOT]</span></div>
       <div class="body"><h3>ASEMboi</h3><p>Robots and AI projects from the Semiconductor Academy's NSEP track.</p>
@@ -334,8 +337,6 @@ header nav a:hover{color:var(--build)}
   <span>Built block by block. © {{ 'now' | date: '%Y' }} Mikhail Armanuel</span><span>mikhail.codes</span>
 </div></footer>
 
-<canvas id="plane" width="84" height="36"></canvas>
-<span class="bubble" id="bubble"></span>
 
 <script data-cfasync="false">
 // ---------- theme ----------
@@ -376,22 +377,21 @@ let li = 0;
 
 document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2003}`;
 
-// ---------- hero sky: drifting pixel clouds + blocks that fall and pile on the ground ----------
+// ---------- hero: blocks that fall and pile on the ground (clouds/stars/jets/birds come from sky.js) ----------
 (() => {
-  const c = document.getElementById('sky'), x = c.getContext('2d');
+  const c = document.getElementById('hero-sky'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const P = 8, tones = ['build', 'agent', 'sky', 'ink'];
   const deep = {build: '--build-deep', agent: '--agent-deep', sky: '--sky-deep', ink: '--muted'};
   let pal;
   const loadPal = () => {
-    pal = {cloud: cssVar('--cloud')};
+    pal = {};
     for (const t of tones) { pal[t] = cssVar('--' + t); pal[t + '-d'] = cssVar(deep[t]); }
   };
   loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) frame(); });
-  let W, H, clouds = [], blocks = [], piles = {};
+  let W, H, blocks = [], piles = {};
   function size() {
     W = c.width = c.offsetWidth; H = c.height = c.offsetHeight;
-    clouds = Array.from({length: 7}, () => ({x: Math.random()*W, y: Math.random()*H*0.55, w: 3+Math.random()*6|0, v: .15+Math.random()*.3}));
     // drop blocks that are now off-screen, re-stack the rest in place
     blocks = blocks.filter(b => b.x <= W - P);
     restack();
@@ -425,12 +425,6 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   };
   function frame() {
     x.clearRect(0, 0, W, H);
-    x.fillStyle = pal.cloud;
-    for (const cl of clouds) {
-      for (let i = 0; i < cl.w; i++) x.fillRect((cl.x + i*P)|0, cl.y|0, P, P);
-      for (let i = 1; i < cl.w-1; i++) x.fillRect((cl.x + i*P)|0, (cl.y-P)|0, P, P);
-      cl.x += cl.v; if (cl.x > W) cl.x = -cl.w*P;
-    }
     const ground = H - 24 - 6;
     for (const b of blocks) {
       if (!b.landed) {
@@ -566,7 +560,7 @@ new IntersectionObserver((es, o) => es.forEach(e => {
     help: () => say('commands: <span class="ok">whoami</span>, <span class="ok">email</span>, <span class="ok">projects</span>, <span class="ok">github</span>, <span class="ok">cv</span>, <span class="ok">clear</span>'),
     whoami: () => say('mikhail armanuel. embedded systems engineer @ wysetime.\nkuala lumpur, MY. nottingham CS. flies sims, builds things.'),
     email: () => { say('opening mail client → <a href="mailto:mail@mikhail.codes">mail@mikhail.codes</a>', 'ok'); location.href = 'mailto:mail@mikhail.codes'; },
-    projects: () => say('asemboi  book-recommend  nand2tetris  sdxl  metarbot\n→ <a href="#projects">scroll up</a>'),
+    projects: () => say('elevra  asemboi  book-recommend  nand2tetris  sdxl  metarbot\n→ <a href="#projects">scroll up</a>'),
     github: () => { say('→ <a href="https://github.com/hootyhoot" target="_blank">github.com/hootyhoot</a>', 'ok'); },
     cv: () => say('→ <a href="/cv/">/cv</a>', 'ok'),
     clear: () => { out.innerHTML = ''; },
@@ -582,74 +576,7 @@ new IntersectionObserver((es, o) => es.forEach(e => {
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') { run(inp.value); inp.value = ''; } });
   document.querySelectorAll('.chip').forEach(b => b.onclick = () => run(b.dataset.c));
 })();
-
-// ---------- companion: a little pixel plane that follows the cursor ----------
-(() => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(pointer: coarse)').matches) {
-    document.getElementById('plane').style.display = 'none'; return;
-  }
-  const c = document.getElementById('plane'), x = c.getContext('2d'), bub = document.getElementById('bubble');
-  // side-view airliner, nose to the right. T tail, F fuselage, o cabin windows,
-  // K cockpit glass, S cheatline stripe, B belly, W wing, E engine
-  const sprite = [
-    'TTT.........................',
-    'TTTT........................',
-    '.TTTT.......................',
-    '.TTTTT......................',
-    '..TTTTFFFFFFFFFFFFFFFFFFF...',
-    '..FFFFFoFoFoFoFoFoFoFoFFKKF.',
-    '..FFFFFFFFFFFFFFFFFFFFFFFFFF',
-    '...SSSSSSSSSSSSSSSSSSSSSSSS.',
-    '....BBBBBBBBBBBBBBBBBBBBBB..',
-    '..........WWWWWWWWW.........',
-    '............WEEEEW..........',
-    '..............EE............',
-  ];
-  const pal = {T: '#d97757', F: '#eceee6', o: '#2c2e29', K: '#6fb7ff', S: '#5ce483', B: '#c4c8bc', W: '#8d9288', E: '#5d6159'};
-  const PX = 3;
-  sprite.forEach((row, y) => [...row].forEach((ch, i) => { if (pal[ch]) { x.fillStyle = pal[ch]; x.fillRect(i*PX, y*PX, PX, PX); } }));
-  let px = innerWidth - 120, py = 120, tx = px, ty = py, flip = false;
-  addEventListener('mousemove', e => { tx = e.clientX + 28; ty = e.clientY - 34; });
-  const lines = {
-    projects: ['Cleared for takeoff.', 'Five projects, zero crashes.', 'nand2tetris: NAND all the way down.'],
-    about: ['Player 1, ready.', 'Lvl up pending.'],
-    graph: ['Green means go.', 'Commit, climb, cruise.'],
-    log: ['Flight log updated.'],
-    contact: ['Type "help".', 'Tower, this is guest…'],
-  };
-  let current = '', hideT;
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (!e.isIntersecting || e.target.id === current || !lines[e.target.id]) return;
-    current = e.target.id;
-    const l = lines[current];
-    bub.textContent = l[Math.random()*l.length|0];
-    bub.style.opacity = 1; clearTimeout(hideT); hideT = setTimeout(() => bub.style.opacity = 0, 2600);
-  }), {threshold: .4});
-  document.querySelectorAll('section[id]').forEach(s => io.observe(s));
-  // contrail: little squares left behind the tail that fade out
-  const puff = document.createElement('div');
-  puff.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:29';
-  document.body.appendChild(puff);
-  let frameN = 0;
-  (function tick() {
-    const dx = tx - px, dy = ty - py;
-    px += dx*.05; py += dy*.05;
-    if (Math.abs(dx) > 6) flip = dx < 0;
-    const tilt = Math.round(Math.max(-12, Math.min(12, dy*.15))/4)*4 * (flip ? -1 : 1);
-    const sx = Math.round(px/3)*3, sy = Math.round(py/3)*3 + Math.round(Math.sin(Date.now()/400))*3;
-    c.style.transform = `translate(${sx}px,${sy}px) scaleX(${flip ? -1 : 1}) rotate(${tilt}deg)`;
-    bub.style.transform = `translate(${sx + 10}px,${sy - 28}px)`;
-    if (++frameN % 5 === 0 && Math.hypot(dx, dy) > 20) {
-      const d = document.createElement('i');
-      const tailX = flip ? sx + 84 : sx, tailY = sy + 10;
-      d.style.cssText = `position:absolute;left:${tailX}px;top:${tailY}px;width:6px;height:6px;background:var(--muted);opacity:.5;transition:opacity 1s steps(4),transform 1s steps(4)`;
-      puff.appendChild(d);
-      requestAnimationFrame(() => { d.style.opacity = 0; d.style.transform = 'scale(2)'; });
-      setTimeout(() => d.remove(), 1000);
-    }
-    requestAnimationFrame(tick);
-  })();
-})();
 </script>
+<script src="/assets/js/sky.js?v={{ site.time | date: '%s' }}" data-cfasync="false" defer></script>
 </body>
 </html>

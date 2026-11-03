@@ -1,6 +1,6 @@
 ---
 name: pixel-redesign
-description: Restyle a website (or a second site in the same family) in the "built block by block" pixel design used on mikhail.codes and books.mikhail.codes - Silkscreen pixel type, near-black/cream themes, square boxes with hard offset shadows, stepped animations, a bobbing clickable hero name, falling blocks onto a striped ground with stalactites, drifting pixel clouds, a cursor-following pixel plane, a shared light/dark cookie, and a striped footer. Use when asked to redesign/restyle a site "like mikhail.codes", apply the pixel theme, or match another site to it.
+description: Restyle a website (or a second site in the same family) in the "built block by block" pixel design used on mikhail.codes and books.mikhail.codes - Silkscreen pixel type, near-black/cream themes, square boxes with hard offset shadows, stepped animations, a bobbing clickable hero name, falling blocks onto a striped ground with stalactites, drifting pixel clouds, a shared light/dark cookie, a striped footer, and write-up images that open in a pixel OS-window viewer with zoom. Use when asked to redesign/restyle a site "like mikhail.codes", apply the pixel theme, or match another site to it.
 ---
 
 # Pixel redesign
@@ -9,9 +9,13 @@ Restyles a site into the pixel/block design built for mikhail.codes (inspired by
 samuelrizzon.dev's look, but all code is original). Two working references live
 next to this file - read them before writing anything:
 
-- `reference/home.html` - the full mikhail.codes homepage (Jekyll layout; the
-  only Liquid in it is the `---` front matter and the footer year). Every
-  component below is in here.
+- `reference/home.html` - a copy of mikhail.codes' `_layouts/home.liquid` (the
+  only Liquid in it is the front matter, the footer year and the `sky.js`
+  version stamp). Every homepage component below is in here. When the homepage
+  changes, re-copy it so the reference never drifts.
+- On the live site (not copied here): `assets/js/sky.js` (page-wide sky),
+  `assets/js/viewer.js` + the `// --- Image viewer` block in
+  `_sass/_components.scss` (write-up image viewer), `_includes/figure.liquid`.
 - `reference/books-style.css` - books.mikhail.codes' stylesheet: the same theme
   applied to an existing multi-page Flask app *without* rewriting its markup.
   Use it as the model for restyling an existing site in place.
@@ -32,7 +36,10 @@ next to this file - read them before writing anything:
    no horizontal overflow, toggle persists across reload, interactive bits work.
    Screenshot and look. The previews will hide minifier/CDN bugs (see Gotchas).
 5. Diff against the remote, push, deploy, then re-run the same browser test
-   against the live URL.
+   against the live URL. mikhail.codes has **no push-to-deploy**: after every
+   push run `ssh root@192.168.0.123 'bash /opt/mikhail-codes/deploy.sh'`
+   (home LAN only; it also redeploys books). The user decided a CI runner is
+   overkill for the portfolio - don't propose one.
 
 ## Design system
 
@@ -78,9 +85,10 @@ next to this file - read them before writing anything:
   spin + spawns blocks). Words are `nowrap` flex groups so the name wraps
   between words on phones. Size with `clamp()` so it never overflows; centre
   the whole hero stack. A small "psst. click the letters." hint.
-- **Hero sky canvas:** drifting pixel clouds; blocks rain down at load and pile
-  on the ground per 8px column; clicked letters throw coloured blocks that land
-  in a darker shade.
+- **Hero blocks canvas** (`#hero-sky`): blocks rain down at load and pile on
+  the ground per 8px column; clicked letters throw coloured blocks that land in
+  a darker shade. Clouds, stars, jets and birds are not drawn here - they come
+  from the page-wide `#sky` canvas below.
 - **Night sky** (`assets/js/sky.js`, shared by every page and books): a fixed
   `#sky` canvas behind everything. Dark mode only: mixed-size 4-pointed pixel
   stars (45% 1px specks, 35% small, 15% medium, 5% big with a diagonal bloom)
@@ -99,7 +107,14 @@ next to this file - read them before writing anything:
   changes: mobile address-bar show/hide fires resize on scroll and would
   reshuffle them.
 - **Project cards:** grid of `.box` cards, 16:9 media well, Silkscreen title,
-  mono description, coloured category tag; hover lifts with a green hard shadow.
+  mono description, coloured category tag (`school` = `--sky`, `personal` =
+  `--agent`; only these two exist); hover lifts with a green hard shadow. The
+  media well is either a real image or a green Silkscreen text glyph like
+  `[BOOKS]`, `[ROBOT]`, `[ELEVRA]` - use a glyph when the only image would be a
+  busy app screenshot that's unreadable at card size. The card title can be a
+  plain description ("Résumé Helper") while the write-up keeps the product
+  name. Silkscreen renders accented Latin letters fine. Add new projects to
+  the terminal's `projects` list too.
 - **Player card (about):** portrait at its natural aspect ratio (don't force a
   square), "Player 1" + flag, `Lvl` = age computed in JS from birth year,
   "Class:", stepped stat bars that fill on scroll, inventory list, "special move".
@@ -109,10 +124,9 @@ next to this file - read them before writing anything:
 - **Log:** dated `.box` rows.
 - **Contact:** link boxes + a fake terminal (`help`, `whoami`, `email`,
   `projects`, `github`, `cv`, `clear`; escape `<` in echoed input).
-- **Companion:** a cursor-following side-view pixel airliner sprite (string grid
-  → canvas) that tilts with vertical speed, flips direction, leaves a fading
-  contrail, and shows a speech bubble per section. Hidden on touch devices and
-  for reduced motion. Swap the sprite for something that fits the new owner.
+- **No cursor companion:** mikhail.codes used to have a cursor-following pixel
+  plane with speech bubbles; it was removed as too playful next to everything
+  else. Don't add one.
 - **Footer:** full width, outside any section, `border-top: 6px solid
   var(--build-deep)` and `repeating-linear-gradient(90deg, stripe-a 0 24px,
   stripe-b 24px 48px)`.
@@ -131,7 +145,34 @@ next to this file - read them before writing anything:
 - **Project write-ups** (`.writeup` in `_components.scss`): styling only, never
   touch the content - terminal-window code blocks, block-row `hr`, square
   bullets, marker sub-headings, dashed links, a stepped reading-progress bar
-  and a "← projects" back link.
+  and a "← projects" back link. Write-ups are `_projects/*.md`: front matter
+  `title`, `description` (the green subtitle), `category` (`school` /
+  `personal`). Figures use `{% include figure.liquid path=... title=... %}`
+  inside `.figure-row` (one image; add `style="justify-items: center;"`) or
+  `.figure-row--balanced` with `--ar-1/--ar-2` set to each image's width/height
+  ratio so side-by-side images share a height; captions in `.figure-caption`.
+- **Image viewer** (`assets/js/viewer.js`): `figure.liquid` wraps every image
+  in `a.figure-link` (no-JS fallback: opens the file in a new tab; Cmd/Ctrl
+  click still does). JS opens it in a modal styled like the code-block windows:
+  2px border, hard 6px shadow, `--surface-raised` title bar holding an 18px red
+  `--role-highlight` close square on the far left (× on hover), the caption
+  (ellipsised), and on the right raised pixel zoom keys `[−] 100% [+]` (32px,
+  press in on click, green on hover, disabled at the 100%/800% limits; the %
+  key resets to fit). Wheel and pinch zoom toward the pointer, double-click
+  toggles fit/250%, drag pans (clamped so the image always covers the stage),
+  `+ - 0` keys, Esc / backdrop click / red square close, focus is trapped and
+  restored, page scroll locks. The window is sized to the fitted image (never
+  narrower than 320px so the controls fit) and centred; 85% black backdrop.
+  Keep the zoom controls visibly labelled - unlabelled coloured squares were
+  rejected as unclear.
+- **Write-up screenshots:** must be readable at the ~800px column width without
+  opening the viewer. Capture with Playwright at `deviceScaleFactor: 2` at the
+  *narrowest* viewport that keeps the app's desktop layout (wide viewports add
+  empty margins and shrink the text), take a full-page shot, then crop to the
+  content: drop the app's own header/footer chrome and empty sides, keep an
+  even margin, and never cut through a card. Use made-up data (a fictional CV,
+  `example.com` emails) and remove promo popups before capturing. Narrow UIs
+  (an extension panel) are cropped to the panel and shown side by side.
 - **Secondary sites** (see `reference/books-style.css`): same tokens/fonts, same
   header, same footer, a `#sky` fixed canvas of drifting clouds behind content,
   a bobbing pixel title rendered per-letter by the template, and the site's own
@@ -175,6 +216,15 @@ cross-site handoff locally.
   trimming old blocks.
 - **Don't let the hero name overflow** - it was cut off at the right edge until
   it was centred with a viewport-based `clamp()` and word wrapping.
+- **Cloudflare edge-caches `/assets/img/*`** (CSS/JS are versioned with
+  `?v=`, images aren't). Replacing an image in place keeps serving the old one
+  for a while: give the new file a new name and update the reference, then
+  compare `curl -s URL | shasum` with the local file.
+- **Mobile `resize` fires on scroll** (address bar show/hide). Anything random
+  that rebuilds on resize (stalactites, clouds) must only rebuild when the
+  *width* changes.
+- **Site JS in `assets/js/` is ES5** (`var`, `function`), matching `nav.js` and
+  `sky.js`, so the uglifier never chokes on it.
 - Leftover local test servers on a port will silently serve stale code - kill by
   port (`lsof -t -iTCP:PORT -sTCP:LISTEN`), not by process name.
 - Credit the inspiration only if the user wants it; never copy its assets,
