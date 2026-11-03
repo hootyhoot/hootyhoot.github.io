@@ -6,7 +6,7 @@
   var links = document.querySelectorAll('a.figure-link');
   if (!links.length) return;
 
-  var MIN = 1, MAX = 8, STEP = 1.5;
+  var MIN = 1, MAX = 8, STEP = 1.5, MIN_BAR = 260;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var overlay = document.createElement('div');
@@ -45,6 +45,9 @@
     var k = Math.min(maxW / nw, maxH / nh, 1);
     fitW = Math.round(nw * k); fitH = Math.round(nh * k);
     stage.style.width = fitW + 'px'; stage.style.height = fitH + 'px';
+    // the window hugs the image (the title truncates), but never narrower than the bar's controls
+    var border = win.offsetWidth - win.clientWidth;
+    win.style.width = (Math.max(fitW, MIN_BAR) + border) + 'px';
     img.style.width = fitW + 'px'; img.style.height = fitH + 'px';
     clamp(); apply();
   }
