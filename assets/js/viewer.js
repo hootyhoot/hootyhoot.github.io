@@ -1,7 +1,7 @@
 // Write-up image viewer: clicking a figure opens it in a pixel "OS window"
-// (same chrome as the code blocks). Red closes, yellow zooms out, green zooms
-// in. Wheel / pinch / double-click zoom, drag to pan, Esc or a click outside
-// closes. Without JS the figure link still opens the image in a new tab.
+// (same chrome as the code blocks). The red square closes; the [-] 100% [+]
+// keys on the right zoom (click the % to fit). Wheel / pinch / double-click
+// zoom, drag to pan, Esc or a click outside closes. Without JS the figure link still opens the image in a new tab.
 (function () {
   var links = document.querySelectorAll('a.figure-link');
   if (!links.length) return;
@@ -17,11 +17,13 @@
   overlay.innerHTML =
     '<div class="viewer-window">' +
       '<div class="viewer-bar">' +
-        '<button type="button" class="viewer-btn viewer-close" aria-label="Close"></button>' +
-        '<button type="button" class="viewer-btn viewer-out" aria-label="Zoom out"></button>' +
-        '<button type="button" class="viewer-btn viewer-in" aria-label="Zoom in"></button>' +
+        '<button type="button" class="viewer-btn viewer-close" aria-label="Close" title="Close (Esc)"></button>' +
         '<span class="viewer-title"></span>' +
-        '<span class="viewer-zoom">100%</span>' +
+        '<div class="viewer-zoombar">' +
+          '<button type="button" class="viewer-btn viewer-key viewer-out" aria-label="Zoom out" title="Zoom out (-)">&minus;</button>' +
+          '<button type="button" class="viewer-btn viewer-zoom" aria-label="Fit to window" title="Fit (0)">100%</button>' +
+          '<button type="button" class="viewer-btn viewer-key viewer-in" aria-label="Zoom in" title="Zoom in (+)">+</button>' +
+        '</div>' +
       '</div>' +
       '<div class="viewer-stage"><img alt="" draggable="false"></div>' +
     '</div>';
@@ -58,6 +60,8 @@
     img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
     zoomLabel.textContent = Math.round(scale * 100) + '%';
     stage.classList.toggle('is-zoomed', scale > 1);
+    overlay.querySelector('.viewer-out').disabled = scale <= MIN;
+    overlay.querySelector('.viewer-in').disabled = scale >= MAX;
   }
 
   // zoom to `next`, keeping the point (px, py) - relative to the stage centre - still
@@ -111,6 +115,7 @@
   overlay.querySelector('.viewer-close').addEventListener('click', close);
   overlay.querySelector('.viewer-in').addEventListener('click', function () { zoomTo(scale * STEP); });
   overlay.querySelector('.viewer-out').addEventListener('click', function () { zoomTo(scale / STEP); });
+  zoomLabel.addEventListener('click', function () { tx = 0; ty = 0; zoomTo(1); });
 
   // a click on the dimmed backdrop (not the window) closes
   overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
