@@ -492,6 +492,12 @@ figure {
   margin: 1.5rem 0;
 }
 
+// write-up images open full size in a new tab
+.figure-link {
+  display: block;
+  cursor: zoom-in;
+}
+
 figure img,
 figure video {
   border: 2px solid var(--border);
