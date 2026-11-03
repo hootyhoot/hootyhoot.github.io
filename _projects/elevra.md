@@ -3,7 +3,7 @@ layout: page
 title: Elevra
 description: an AI job-fit analyser for your CV, on the web and in your browser
 importance: 1
-category: work
+category: personal
 ---
 
 Elevra is something we've been building at StraitsTec. You give it your CV and a job listing, and it tells you how well they fit, which of the job's requirements your CV actually backs up, and what you could change to close the gap. It's live at <a href="https://elevra.straitstec.my" target="_blank">elevra.straitstec.my</a>, and a browser extension that does the same thing right on the job listing is on its way.
