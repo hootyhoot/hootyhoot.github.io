@@ -17,7 +17,7 @@ Elevra started life as an ATS (applicant tracking system) for recruiters: paste 
 
 But the more we used it, the more it felt like the person who actually needs the feedback is the one applying. A recruiter just wants a ranking, a job seeker wants to know *why* they'd be ranked low and what to fix. So the website is now one CV against one job, with suggestions.
 
-<div class="figure-row cols-2">
+<div class="figure-row" style="justify-items: center;">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/elevra1.webp" title="Elevra result view with overview, requirements and suggestions" class="img-fluid rounded z-depth-1" %}
     </div>
