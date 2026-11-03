@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Elevra
-description: an AI job-fit analyser for your CV, on the web and as an browser extension
+description: an AI job-fit analyser for your CV, on the web and as a browser extension
 importance: 1
 category: personal
 ---
