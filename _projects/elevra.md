@@ -74,10 +74,10 @@ Copy-pasting job descriptions gets old fast, so the extension brings Elevra onto
 
 <div class="figure-row figure-row--balanced" style="--ar-1: 0.481fr; --ar-2: 0.485fr;">
     <div>
-        {% include figure.liquid loading="eager" path="assets/img/elevra3.webp" title="Elevra extension panel showing the job it read from the page" %}
+        {% include figure.liquid loading="eager" path="assets/img/elevra-ext-job.webp" title="Elevra extension panel showing the job it read from the page" %}
     </div>
     <div>
-        {% include figure.liquid loading="eager" path="assets/img/elevra4.webp" title="Elevra extension panel showing the analysis overview" %}
+        {% include figure.liquid loading="eager" path="assets/img/elevra-ext-overview.webp" title="Elevra extension panel showing the analysis overview" %}
     </div>
 </div>
 <div class="figure-caption">
