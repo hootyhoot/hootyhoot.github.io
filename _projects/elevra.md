@@ -72,7 +72,7 @@ Getting text out of a PDF reliably was its own little adventure. Lots of CV temp
 <h4>The browser extension</h4>
 Copy-pasting job descriptions gets old fast, so the extension brings Elevra onto the listing itself. It works on JobStreet, LinkedIn, Hiredly and Indeed. On a job page a small Elevra button shows up on the side, and clicking it opens a panel that has already read the title, company and full description off the page.
 
-<div class="figure-row figure-row--balanced" style="--ar-1: 0.494fr; --ar-2: 0.575fr;">
+<div class="figure-row figure-row--balanced" style="--ar-1: 0.481fr; --ar-2: 0.485fr;">
     <div>
         {% include figure.liquid loading="eager" path="assets/img/elevra3.webp" title="Elevra extension panel showing the job it read from the page" %}
     </div>
@@ -81,7 +81,7 @@ Copy-pasting job descriptions gets old fast, so the extension brings Elevra onto
     </div>
 </div>
 <div class="figure-caption">
-    The panel on a demo job page, before and after analysing. Same CV as above, run against a local dev build.
+    The panel on a demo job page, before and after analysing, with the same CV as above.
 </div>
 
 Some things that made the extension trickier than the website:
