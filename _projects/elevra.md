@@ -19,7 +19,7 @@ But the more we used it, the more it felt like the person who actually needs the
 
 <div class="figure-row" style="justify-items: center;">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/elevra-result-hd.webp" title="Elevra result view with overview, requirements and suggestions" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/elevra-result-crop.webp" title="Elevra result view with overview, requirements and suggestions" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 <div class="figure-caption">
