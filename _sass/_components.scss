@@ -806,12 +806,12 @@ html.viewer-open {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 34px;
-  padding: 4px 8px 4px 12px;
+  min-height: 46px;
+  padding: 6px 10px 6px 14px;
   border-bottom: 2px solid var(--border);
   background: var(--surface-raised);
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--ink-muted);
 }
 
@@ -832,10 +832,10 @@ html.viewer-open {
 
 // close: the red "OS" square, x shows on hover
 .viewer-close {
-  width: 12px;
-  height: 12px;
+  width: 18px;
+  height: 18px;
   background: var(--role-highlight);
-  font: 700 10px/12px var(--font-body);
+  font: 700 15px/18px var(--font-body);
   color: transparent;
   text-align: center;
 }
@@ -845,7 +845,7 @@ html.viewer-open {
   display: block;
 }
 
-// bigger hit area than the 12px square
+// bigger hit area than the 18px square
 .viewer-close::after {
   content: "";
   position: absolute;
@@ -869,31 +869,31 @@ html.viewer-open {
 .viewer-zoombar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex: none;
 }
 
 .viewer-key,
 .viewer-zoom {
-  height: 22px;
+  height: 32px;
   border: 2px solid var(--border);
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 2px 2px 0 var(--hard-shadow);
+  box-shadow: 3px 3px 0 var(--hard-shadow);
   transition: transform 0.06s steps(1), box-shadow 0.06s steps(1);
 }
 
 .viewer-key {
-  width: 22px;
-  font-size: 15px;
+  width: 32px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 16px;
+  line-height: 26px;
 }
 
 .viewer-zoom {
-  min-width: 52px;
-  padding: 0 6px;
-  font-size: 0.72rem;
+  min-width: 68px;
+  padding: 0 8px;
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -905,7 +905,7 @@ html.viewer-open {
 
 .viewer-key:active:not(:disabled),
 .viewer-zoom:active {
-  transform: translate(2px, 2px);
+  transform: translate(3px, 3px);
   box-shadow: none;
 }
 

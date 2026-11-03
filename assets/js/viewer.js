@@ -6,7 +6,7 @@
   var links = document.querySelectorAll('a.figure-link');
   if (!links.length) return;
 
-  var MIN = 1, MAX = 8, STEP = 1.5, MIN_BAR = 260;
+  var MIN = 1, MAX = 8, STEP = 1.5, MIN_BAR = 320;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var overlay = document.createElement('div');
