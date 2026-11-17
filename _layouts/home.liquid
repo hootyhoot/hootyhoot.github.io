@@ -13,9 +13,20 @@
   // theme cookie is shared with books.mikhail.codes; dark unless chosen otherwise
   document.documentElement.setAttribute('data-theme', (document.cookie.match(/(?:^|; )theme=(light|dark)/) || [])[1] || 'dark');
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" href="/assets/fonts/web/silkscreen-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/web/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://github-contributions-api.jogruber.de" crossorigin>
+<!-- same instant navigation as the inner pages (_includes/head.liquid) -->
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "href_matches": "/*" },
+    "eagerness": "moderate"
+  }]
+}
+</script>
 <style>
+{% include fonts.css %}
 :root{
   --bg:#0c0d0b; --bg-2:#141512; --shadow:#2c2e29;
   --ink:#eceee6; --ink-2:#d9dcd2; --muted:#8d9288;
@@ -245,17 +256,17 @@ header nav a:hover{color:var(--build)}
       <div class="meta"><span class="tag personal">personal</span><span>books.mikhail.codes</span></div></div>
     </a>
     <a class="card box" href="/projects/nand2tetris/">
-      <div class="media"><img src="/assets/img/nand2tetris1.webp" alt=""></div>
+      <div class="media"><img src="/assets/img/nand2tetris1-card.webp" srcset="/assets/img/nand2tetris1-card.webp 660w, /assets/img/nand2tetris1.webp 2361w" sizes="(max-width: 680px) calc(100vw - 52px), (max-width: 1023px) 46vw, 330px" alt=""></div>
       <div class="body"><h3>nand2tetris</h3><p>Building a computer from the ground up, starting at NAND.</p>
       <div class="meta"><span class="tag school">school</span><span>HDL → ASM</span></div></div>
     </a>
     <a class="card box" href="/projects/sdxl/">
-      <div class="media"><img src="/assets/img/sdxl1.webp" alt=""></div>
+      <div class="media"><img src="/assets/img/sdxl1-card.webp" srcset="/assets/img/sdxl1-card.webp 660w, /assets/img/sdxl1.webp 1024w" sizes="(max-width: 680px) calc(100vw - 52px), (max-width: 1023px) 46vw, 330px" alt=""></div>
       <div class="body"><h3>Stable diffusion study</h3><p>A study in the Replicate API and Vercel deployments.</p>
       <div class="meta"><span class="tag personal">personal</span><span>SDXL</span></div></div>
     </a>
     <a class="card box" href="/projects/dockerising/">
-      <div class="media"><img src="/assets/img/dockerising1.webp" alt=""></div>
+      <div class="media"><img src="/assets/img/dockerising1-card.webp" srcset="/assets/img/dockerising1-card.webp 658w, /assets/img/dockerising1.webp 810w" sizes="(max-width: 680px) calc(100vw - 52px), (max-width: 1023px) 46vw, 330px" alt=""></div>
       <div class="body"><h3>Dockerising METARbot</h3><p>Rebuilding METARbot to be hosted in a container.</p>
       <div class="meta"><span class="tag personal">personal</span><span>Docker</span></div></div>
     </a>
@@ -388,13 +399,17 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     pal = {};
     for (const t of tones) { pal[t] = cssVar('--' + t); pal[t + '-d'] = cssVar(deep[t]); }
   };
-  loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) frame(); });
-  let W, H, blocks = [], piles = {};
+  loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) frame(); else wake(); });
+  let W, H, blocks = [], piles = {}, running = false;
+  // the loop only runs while blocks are falling; once they've all landed the
+  // canvas holds still until something spawns, resizes or re-themes it
+  const wake = () => { if (!running && !reduce) { running = true; requestAnimationFrame(frame); } };
   function size() {
     W = c.width = c.offsetWidth; H = c.height = c.offsetHeight;
     // drop blocks that are now off-screen, re-stack the rest in place
     blocks = blocks.filter(b => b.x <= W - P);
     restack();
+    wake();
   }
   // rebuild column heights from landed blocks (after a resize or trimming old blocks)
   function restack() {
@@ -413,6 +428,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       tone: tone || tones[Math.random()*tones.length|0], landed: false,
     });
     if (blocks.length > 400) { blocks.splice(0, blocks.length - 400); restack(); }
+    wake();
   };
   size();
   // intro: blocks rain down onto the ground
@@ -426,8 +442,10 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   function frame() {
     x.clearRect(0, 0, W, H);
     const ground = H - 24 - 6;
+    let moving = false;
     for (const b of blocks) {
       if (!b.landed) {
+        moving = true;
         b.vy += .6; b.x += b.vx; b.y += b.vy; b.vx *= .98;
         if (b.x < 0 || b.x > W - P) { b.vx *= -1; b.x = Math.max(0, Math.min(W - P, b.x)); }
         const col = b.x/P|0, floor = ground - P - (piles[col] || 0)*P;
@@ -436,9 +454,11 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       x.fillStyle = pal[b.landed ? b.tone + '-d' : b.tone];
       x.fillRect(b.x|0, b.y|0, P, P);
     }
-    if (!reduce) requestAnimationFrame(frame);
+    if (reduce) return;
+    if (moving) requestAnimationFrame(frame); else running = false;
   }
-  frame();
+  // size() above already woke the loop; reduced motion draws once instead
+  if (reduce) frame();
 })();
 
 // ---------- underground: pixel stalactites with the odd drip ----------
@@ -446,7 +466,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   const c = document.getElementById('under'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const P = 8, H = 72;
-  let W, heights = [], tips = [], drips = [], body, tip;
+  let W, heights = [], tips = [], drips = [], body, tip, visible = true, running = false;
   const loadPal = () => { body = cssVar('--shadow'); tip = cssVar('--ground-2'); };
   function build() {
     const dpr = devicePixelRatio || 1;
@@ -482,6 +502,8 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     x.globalAlpha = 1;
   }
   function frame() {
+    // off-screen: stop the loop; the observer below restarts it on the way back
+    if (!visible) { running = false; return; }
     if (Math.random() < .012 && tips.length) {
       const t = tips[Math.random()*tips.length|0];
       drips.push({x: t*P + 2, y: heights[t]*P, v: .4});
@@ -494,7 +516,11 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   // regenerate when the width really changes, or the stalactites reshuffle
   addEventListener('resize', () => { if (c.clientWidth === W) return; build(); if (reduce) draw(); });
   addEventListener('themechange', () => { loadPal(); if (reduce) draw(); });
-  if (reduce) draw(); else frame();
+  if (reduce) draw(); else { running = true; frame(); }
+  new IntersectionObserver(es => {
+    visible = es[0].isIntersecting;
+    if (visible && !running && !reduce) { running = true; frame(); }
+  }).observe(c);
 })();
 
 // ---------- stat bars ----------
