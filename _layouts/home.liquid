@@ -33,7 +33,7 @@
   --build:#5ce483; --agent:#d97757; --sky:#6fb7ff;
   --surface-2:#1b1d19; --cloud:#1a1c18; --ground-2:#232520; --ground-top:#3a8f53;
   --build-deep:#1f6b37; --agent-deep:#8f4d36; --sky-deep:#3e6f9e; --amber:#e5c07b;
-  --g0:#1b1d19; --g1:#1f5a33; --g2:#2f8a4c; --g3:#45b96a; --g4:#5ce483;
+  --g0:#2c312d; --g1:#26703c; --g2:#309550; --g3:#45bb68; --g4:#5ce483;
   --stripe-a:#141512; --stripe-b:#1b1d19;
   color-scheme:dark;
 }
@@ -43,7 +43,7 @@
   --build:#2f8a4c; --agent:#b85a3a; --sky:#2e6e8e;
   --surface-2:#eae2c8; --cloud:#e6dec4; --ground-2:#ddd3b3; --ground-top:#2f8a4c;
   --build-deep:#1f5a33; --agent-deep:#7a3a24; --sky-deep:#1d4a60; --amber:#b8862b;
-  --g0:#e4dcc1; --g1:#b5dfb9; --g2:#7cc48a; --g3:#45a35e; --g4:#2b7a41;
+  --g0:#dbd7c9; --g1:#66b679; --g2:#3a9454; --g3:#26703c; --g4:#1d4d2a;
   --stripe-a:#eae2c8; --stripe-b:#fffbf0;
   color-scheme:light;
 }
@@ -155,7 +155,7 @@ header nav a:hover{color:var(--build)}
 /* contribution graph */
 .intro{font-family:"JetBrains Mono",monospace;color:var(--ink-2);margin:-20px 0 28px;font-size:14px;line-height:1.6}
 .graph{padding:20px;overflow-x:auto}
-.graph canvas{display:block}
+.graph canvas{display:block;max-width:100%}
 .graph figcaption{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--muted);gap:12px;flex-wrap:wrap}
 .graph figcaption a{color:var(--build);text-decoration:none}
 
@@ -534,8 +534,7 @@ new IntersectionObserver((es, o) => es.forEach(e => {
   let colors;
   const loadColors = () => { colors = [0, 1, 2, 3, 4].map(i => cssVar('--g' + i)); };
   loadColors();
-  const S = 12, G = 3;
-  let days = [];
+  let days = [], S, G, pos = [];
   try {
     const r = await fetch('https://github-contributions-api.jogruber.de/v4/hootyhoot?y=last');
     const d = await r.json();
@@ -547,30 +546,46 @@ new IntersectionObserver((es, o) => es.forEach(e => {
   }
   const offset = new Date(days[0].date).getDay();
   const cols = Math.ceil((days.length + offset) / 7);
-  const dpr = devicePixelRatio || 1;
-  c.width = cols*(S+G)*dpr; c.height = 7*(S+G)*dpr;
-  c.style.width = cols*(S+G) + 'px'; c.style.height = 7*(S+G) + 'px';
-  x.scale(dpr, dpr);
-  const pos = days.map((d, i) => Object.assign({}, d, {cx: ((i+offset)/7|0)*(S+G), cy: ((i+offset)%7)*(S+G)}));
+  // size the blocks to the box: 12px + 3px gap on desktop, smaller on phones so
+  // the whole year fits without scrolling sideways
+  let fitW = 0;
+  function layout() {
+    const cs = getComputedStyle(c.parentElement);
+    fitW = c.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const step = Math.max(3, Math.min(15, Math.floor(fitW / cols)));
+    G = Math.max(1, Math.round(step / 5)); S = step - G;
+    const dpr = devicePixelRatio || 1;
+    c.width = cols*step*dpr; c.height = 7*step*dpr;
+    c.style.width = cols*step + 'px'; c.style.height = 7*step + 'px';
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    pos = days.map((d, i) => Object.assign({}, d, {cx: ((i+offset)/7|0)*step, cy: ((i+offset)%7)*step}));
+  }
+  layout();
   // blocks "fall" into place column by column
   let t = 0;
   function draw() {
     x.clearRect(0, 0, c.width, c.height);
+    const step = S + G, snap = Math.max(1, Math.round(step / 5));
     let done = true;
     for (const p of pos) {
-      const delay = p.cx/(S+G)*1.2;
+      const delay = p.cx/step*1.2;
       const k = Math.min(1, Math.max(0, (t - delay)/10));
       if (k < 1) done = false;
       if (k <= 0) continue;
-      const y = p.cy - (1-k)*(1-k)*60;
+      const y = p.cy - (1-k)*(1-k)*step*4;
       x.fillStyle = colors[p.level];
-      x.fillRect(p.cx, Math.round(y/3)*3, S, S);
+      x.fillRect(p.cx, Math.round(y/snap)*snap, S, S);
     }
     t++;
     if (!done) requestAnimationFrame(draw);
   }
   new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { draw(); o.disconnect(); } }, {threshold: .3}).observe(c);
   addEventListener('themechange', () => { loadColors(); t = Math.max(t, 1e4); draw(); });
+  addEventListener('resize', () => {
+    const cs = getComputedStyle(c.parentElement);
+    if (c.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) === fitW) return;
+    layout(); if (t) { t = Math.max(t, 1e4); draw(); }
+  });
   c.addEventListener('mousemove', e => {
     const r = c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
     const p = pos.find(p => mx >= p.cx && mx < p.cx+S && my >= p.cy && my < p.cy+S);
