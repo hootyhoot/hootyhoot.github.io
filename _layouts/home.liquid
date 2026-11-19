@@ -378,7 +378,7 @@ let li = 0;
     inner.addEventListener('click', () => {
       inner.classList.remove('kick'); void inner.offsetWidth; inner.classList.add('kick');
       const r = inner.getBoundingClientRect();
-      if (window.spawnDrops) window.spawnDrops(r.left + r.width/2, r.top + r.height/2, 10);
+      if (window.spawnDrops) window.spawnDrops(r.left + r.width/2, r.top + r.height/2, 20);
     });
     inner.addEventListener('animationend', () => inner.classList.remove('kick'));
     // Hover is tracked on the outer span, which doesn't lift, so the letter
@@ -395,22 +395,30 @@ let li = 0;
 document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2003}`;
 
 // ---------- hero: the letters shed water drops, and plants grow where they land (clouds/stars/jets/birds come from sky.js) ----------
-// Every plant starts as the same two-leaf seedling. Each drop that lands on a
-// plant grows it a stage: a tree goes seedling -> sapling -> young tree ->
-// tree with bark -> big old tree; flowers, grass and bushes top out sooner.
-// Water on a fully grown plant seeds a new one nearby, so the ground keeps
-// getting denser as well as taller.
+// Most plants start as the same two-leaf seedling (mushrooms start as a
+// button). Each drop that lands on a plant grows it: a tree goes seedling ->
+// sapling -> young tree -> tree with bark -> big old tree, in its own species'
+// shape; flowers, ferns and the rest top out sooner. Water on a fully grown
+// plant seeds a new one nearby, so the ground keeps getting denser as well
+// as taller.
 (() => {
   const c = document.getElementById('hero-sky'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const Q = 4;  // one plant pixel
-  const MAX = {tree: 14, flower: 6, grass: 4, bush: 6};
-  const WEIGHT = {tree: .25, flower: .4, grass: .2, bush: .15};
-  const petals = ['agent', 'amber', 'sky'];
+  const MAX = {tree: 14, flower: 6, sunflower: 7, lavender: 5, mushroom: 6, fern: 6, grass: 4, bush: 6};
+  const WEIGHT = {tree: .32, flower: .18, sunflower: .07, lavender: .08, mushroom: .07, fern: .08, grass: .12, bush: .08};
+  const SPECIES = ['oak', 'pine', 'birch', 'cherry', 'maple', 'palm'];
+  const STAGES_PER_DROP = 2;
+  const petals = ['agent', 'amber', 'sky', 'pink'];
   let pal;
   const loadPal = () => {
     pal = {};
     for (const k of ['build', 'build-deep', 'agent', 'agent-deep', 'sky', 'amber', 'ink']) pal[k] = cssVar('--' + k);
+    // colours the site palette doesn't have, per theme
+    const light = document.documentElement.getAttribute('data-theme') === 'light';
+    Object.assign(pal, light
+      ? {pink: '#d4709c', 'pink-deep': '#a84f78', purple: '#7b5cc0', birch: '#fffdf6', mark: '#3a3226', pine: '#2c6b45', 'pine-deep': '#173f29', gold: '#d9a521', rust: '#b5512f'}
+      : {pink: '#f2a7c8', 'pink-deep': '#c9719a', purple: '#b39cf0', birch: '#e9e5d6', mark: '#3a3a34', pine: '#2f8a57', 'pine-deep': '#17502f', gold: '#f0c24a', rust: '#d9693f'});
   };
   loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) draw(); else wake(); });
   let W, H, drops = [], splashes = [], plants = [], running = false;
@@ -425,28 +433,26 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   }
   addEventListener('resize', size);
 
+  const pick = arr => arr[Math.random()*arr.length|0];
   function pickKind() {
     let r = Math.random();
     for (const k in WEIGHT) { if ((r -= WEIGHT[k]) < 0) return k; }
     return 'flower';
   }
   const free = col => col >= 2 && (col + 2)*Q <= W && !plants.some(p => Math.abs(p.col - col) < 3);
-  function sprout(col, kind) {
-    const p = {kind: kind || pickKind(), col, s: 1, d: reduce ? 1 : 0, seed: Math.random()*1000,
-      petal: petals[Math.random()*petals.length|0], tulip: Math.random() < .4, side: Math.random() < .5 ? -1 : 1};
-    plants.push(p);
-    return p;
+  function sprout(col, kind, species) {
+    plants.push({kind: kind || pickKind(), species: species || pick(SPECIES), col, s: 1, d: reduce ? 1 : 0,
+      seed: Math.random()*1000, petal: pick(petals), tulip: Math.random() < .4, side: Math.random() < .5 ? -1 : 1});
   }
   // a grown plant drops a seed a little way off, usually of its own kind
   function spread(p) {
     for (let i = 0; i < 12; i++) {
       const col = p.col + (Math.random() < .5 ? -1 : 1)*(3 + (Math.random()*9|0));
-      if (free(col)) { sprout(col, Math.random() < .6 ? p.kind : null); return; }
+      if (free(col)) { Math.random() < .6 ? sprout(col, p.kind, p.species) : sprout(col); return; }
     }
   }
   function water(p) {
-    // two stages per drop, so a few clicks show a tree going through its forms
-    if (p.s < MAX[p.kind]) { p.s = Math.min(MAX[p.kind], p.s + 2); if (reduce) p.d = p.s; } else spread(p);
+    if (p.s < MAX[p.kind]) { p.s = Math.min(MAX[p.kind], p.s + STAGES_PER_DROP); if (reduce) p.d = p.s; } else spread(p);
   }
   function landOnGround(px) {
     const col = Math.round(px/Q);
@@ -456,71 +462,151 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     if (near) water(near);
   }
 
-  // shape of a plant at growth v (a float, so growth animates pixel by pixel)
+  // Size of a plant at growth v (a float, so growth animates pixel by pixel):
+  // top and half-width are what a falling drop hits; the rest drives drawing.
   function shape(p, v) {
-    const g = groundY();
+    const g = groundY(), k = p.kind;
+    if (k === 'mushroom') {
+      const h = 1 + Math.round(v*.6), cap = 1 + Math.round(v*.45);
+      return {top: g - (h + 2)*Q, half: cap, h, cap};
+    }
     if (v < 2) { const h = Math.max(1, Math.round(v + .4)); return {top: g - (h + 1)*Q, half: 1, h}; }
-    if (p.kind === 'tree') {
-      if (v < 4) { const h = Math.round(4 + (v - 2)*3); return {top: g - (h + 1)*Q, half: 1, h}; }
-      const th = Math.round(3 + (v - 4)*1.5), rx = Math.round(2 + (v - 4)*.8), ry = Math.round(rx*.8 + .5);
-      const tw = v < 7 ? 1 : v < 11 ? 2 : 3, cy = g - th*Q - Math.round(ry*.4)*Q;
+    if (k === 'tree') {
+      if (v < 4) { const h = Math.round(4 + (v - 2)*3); return {top: g - (h + 2)*Q, half: 1, h}; }
+      const u = v - 4, sp = p.species;
+      if (sp === 'pine') {
+        const th = 2 + Math.round(u*.4), ch = Math.round(6 + u*2.3), w = Math.round(2 + u*.55);
+        return {top: g - (th + ch)*Q, half: w, th, ch, w, tiers: 2 + Math.floor(u/3)};
+      }
+      if (sp === 'palm') {
+        const th = Math.round(5 + u*2.3), fl = Math.round(2 + u*.5);
+        return {top: g - (th + 2)*Q, half: fl + 1, th, fl};
+      }
+      let th = Math.round(3 + u*1.5), rx = Math.round(2 + u*.8), ry = Math.round(rx*.8 + .5);
+      if (sp === 'birch') { th = Math.round(th*1.2); rx = Math.max(2, Math.round(rx*.65)); ry = Math.round(ry*1.3); }
+      const tw = sp === 'birch' ? (u < 5 ? 1 : 2) : u < 3 ? 1 : u < 7 ? 2 : 3;
+      const cy = g - th*Q - Math.round(ry*.4)*Q;
       return {top: cy - ry*Q, half: rx, th, rx, ry, tw, cy};
     }
-    if (p.kind === 'flower') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 3)*Q, half: 1, h}; }
-    if (p.kind === 'grass') { const h = Math.round(1 + (v - 1)*1.2); return {top: g - h*Q, half: v >= 3 ? 2 : 1, h}; }
+    if (k === 'flower') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 3)*Q, half: 1, h}; }
+    if (k === 'sunflower') { const h = Math.round(4 + (v - 2)*3), r = v >= 6 ? 3 : 2; return {top: g - (h + r + 1)*Q, half: r, h, r}; }
+    if (k === 'lavender') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 1)*Q, half: 2, h}; }
+    if (k === 'fern') { const l = Math.round(2 + (v - 2)*1.4); return {top: g - (l + 1)*Q, half: l, l}; }
+    if (k === 'grass') { const h = Math.round(1 + (v - 1)*1.2); return {top: g - h*Q, half: v >= 3 ? 2 : 1, h}; }
     const rx = Math.round(1 + (v - 2)*.7), ry = Math.max(1, Math.round(rx*.7));
     return {top: g - (2*ry + 1)*Q, half: rx, rx, ry, cy: g - (ry + 1)*Q};
   }
 
   const px = (cx, cy, color) => { x.fillStyle = pal[color]; x.fillRect(cx, cy, Q, Q); };
+  const rect = (cx, cy, w, h, color) => { x.fillStyle = pal[color]; x.fillRect(cx, cy, w, h); };
   const shade = (cx, cy, w, h, a) => { x.fillStyle = `rgba(0,0,0,${a})`; x.fillRect(cx, cy, w, h); };
-  // a lumpy pixel blob, lit from the top left
-  function blob(cx, cy, rx, ry, seed) {
+  // a lumpy pixel blob, lit from the top left; fleck is an odd pixel of a third colour
+  function blob(cx, cy, rx, ry, seed, lit, body, fleck) {
     for (let dy = -ry; dy <= ry; dy++) for (let dx = -rx; dx <= rx; dx++) {
       const e = (dx/(rx + .5))**2 + (dy/(ry + .5))**2;
       if (e > 1 || (e > .7 && hash(seed, dx, dy) < .4)) continue;
-      const l = (dx + dy*1.3)/(rx + ry);
-      const X = cx + dx*Q, Y = cy + dy*Q;
-      px(X, Y, l < -.3 ? 'build' : 'build-deep');
+      const l = (dx + dy*1.3)/(rx + ry), X = cx + dx*Q, Y = cy + dy*Q;
+      px(X, Y, l < -.3 ? lit : body);
       if (l > .35) shade(X, Y, Q, Q, .3);
-      else if (l > -.3 && hash(seed, dy, dx) < .12) px(X, Y, 'build');
+      else if (hash(seed, dy, dx) < .12) px(X, Y, fleck || lit);
     }
   }
+  const CANOPY = {oak: ['build', 'build-deep'], birch: ['build', 'build-deep', 'gold'], cherry: ['pink', 'pink-deep', 'ink'], maple: ['amber', 'rust', 'agent']};
+
+  function drawTree(p, sh, v) {
+    const g = groundY(), cx = p.col*Q, sp = p.species;
+    if (v < 4) {
+      // sapling: a thin stem with leaves up alternate sides and a tuft on top
+      // (a pine sapling is already a little cone, a palm one a fan of fronds)
+      if (sp === 'pine') {
+        rect(cx, g - 2*Q, Q, 2*Q, 'agent-deep');
+        for (let r = 0; r < sh.h; r++) { const w = Math.round((sh.h - r)/3); rect(cx - w*Q, g - (r + 3)*Q, (2*w + 1)*Q, Q, r % 3 ? 'pine' : 'pine-deep'); }
+        return;
+      }
+      if (sp === 'palm') {
+        rect(cx, g - sh.h*Q, Q, sh.h*Q, 'agent-deep');
+        for (const d of [-2, -1, 1, 2]) px(cx + d*Q, g - (sh.h + (Math.abs(d) > 1 ? 0 : 1))*Q, 'build');
+        px(cx, g - (sh.h + 1)*Q, 'build');
+        return;
+      }
+      rect(cx, g - sh.h*Q, Q, sh.h*Q, sp === 'birch' ? 'birch' : 'agent-deep');
+      const leaf = sp === 'cherry' ? 'pink' : sp === 'maple' ? 'amber' : 'build';
+      for (let y = 2; y < sh.h; y += 2) px(cx + (y % 4 ? -Q : Q), g - y*Q, leaf);
+      for (const d of [-1, 0, 1]) px(cx + d*Q, g - (sh.h + 1)*Q, leaf);
+      return;
+    }
+    if (sp === 'pine') {
+      rect(cx, g - sh.th*Q, Q, sh.th*Q, 'agent-deep');
+      shade(cx, g - sh.th*Q, Q, sh.th*Q, .2);
+      // stacked tiers, each wide at the bottom and narrowing up
+      const tierH = sh.ch/sh.tiers;
+      for (let r = 0; r < sh.ch; r++) {
+        const t = Math.floor(r/tierH), f = (r - t*tierH)/tierH;
+        const w = Math.max(0, Math.round(sh.w*(1 - t/sh.tiers*.6)*(1 - f*.75)));
+        const y = g - (sh.th + r + 1)*Q;
+        rect(cx - w*Q, y, (w + 1)*Q, Q, 'pine');
+        rect(cx + Q, y, w*Q, Q, 'pine-deep');
+        if (f < .2 && w > 1) shade(cx - w*Q, y, (2*w + 1)*Q, Q, .25);
+      }
+      px(cx, g - (sh.th + sh.ch + 1)*Q, 'pine');
+      return;
+    }
+    if (sp === 'palm') {
+      // a trunk that leans as it rises, ringed every couple of pixels, fronds drooping off the top
+      let tx = cx;
+      for (let r = 0; r < sh.th; r++) {
+        if (r && r % 5 === 0) tx += p.side*Q;
+        rect(tx, g - (r + 1)*Q, Q, Q, 'agent-deep');
+        if (r % 2) shade(tx, g - (r + 1)*Q, Q, Q, .3);
+      }
+      const ty = g - (sh.th + 1)*Q;
+      for (const dir of [-1, 1]) for (const lift of [1, 0]) for (let i = 1; i <= sh.fl; i++) {
+        const droop = Math.floor(i*i/(sh.fl + 1)) - lift;
+        px(tx + dir*i*Q, ty + droop*Q, lift ? 'build' : 'build-deep');
+      }
+      px(tx, ty - Q, 'build');
+      if (v >= 8) { px(tx - Q, ty + Q, 'agent'); px(tx + Q, ty + Q, 'agent'); shade(tx + Q, ty + Q, Q, Q, .3); }
+      return;
+    }
+    const left = cx - ((sh.tw - 1) >> 1)*Q, trunkTop = sh.cy, birch = sp === 'birch';
+    rect(left, trunkTop, sh.tw*Q, g - trunkTop, birch ? 'birch' : 'agent-deep');
+    // bark: dark marks on a birch, darker seams on the rest once the trunk is thick
+    for (let y = trunkTop; y < g; y += Q) for (let i = 0; i < sh.tw; i++) {
+      const h = hash(p.seed, i, y);
+      if (birch ? h < .25 : sh.tw > 1 && h < .3) birch ? px(left + i*Q, y, 'mark') : shade(left + i*Q, y, Q, Q, .35);
+    }
+    shade(left + (sh.tw - 1)*Q, trunkTop, Q, g - trunkTop, .2);
+    if (sh.tw === 3) { px(left - Q, g - Q, 'agent-deep'); px(left + 3*Q, g - Q, 'agent-deep'); }
+    if (v >= 8) {
+      const by = sh.cy + (sh.ry - 1)*Q, bx = p.side > 0 ? left + sh.tw*Q : left - Q, bark = birch ? 'birch' : 'agent-deep';
+      px(bx, by, bark); px(bx + p.side*Q, by - Q, bark);
+    }
+    const [lit, body, fleck] = CANOPY[sp];
+    blob(cx, sh.cy, sh.rx, sh.ry, p.seed, lit, body, fleck);
+  }
+
   function drawPlant(p) {
-    const g = groundY(), cx = p.col*Q, v = p.d, sh = shape(p, v);
+    const g = groundY(), cx = p.col*Q, v = p.d, sh = shape(p, v), k = p.kind;
+    if (k === 'mushroom') {
+      // a stalk and a spotted cap that both widen as it grows
+      rect(cx, g - sh.h*Q, Q, sh.h*Q, 'ink'); shade(cx, g - sh.h*Q, Q, sh.h*Q, .15);
+      const cy = g - (sh.h + 1)*Q;
+      rect(cx - sh.cap*Q, cy, (2*sh.cap + 1)*Q, Q, 'agent');
+      rect(cx - (sh.cap - 1)*Q, cy - Q, (2*sh.cap - 1)*Q, Q, 'agent');
+      shade(cx - sh.cap*Q, cy, (2*sh.cap + 1)*Q, Q, .2);
+      if (sh.cap > 1) { px(cx - Q, cy - Q, 'ink'); px(cx + (sh.cap - 1)*Q, cy, 'ink'); }
+      return;
+    }
     if (v < 2) {
       // seedling: a short stem and two leaves
-      x.fillStyle = pal['build-deep']; x.fillRect(cx, g - sh.h*Q, Q, sh.h*Q);
+      rect(cx, g - sh.h*Q, Q, sh.h*Q, 'build-deep');
       px(cx - Q, g - (sh.h + 1)*Q, 'build'); px(cx + Q, g - (sh.h + 1)*Q, 'build');
       return;
     }
-    if (p.kind === 'tree' && v < 4) {
-      // sapling: a thin stem with leaves up alternate sides and a tuft on top
-      x.fillStyle = pal['agent-deep']; x.fillRect(cx, g - sh.h*Q, Q, sh.h*Q);
-      for (let y = 2; y < sh.h; y += 2) px(cx + (y % 4 ? -Q : Q), g - y*Q, 'build');
-      px(cx - Q, g - (sh.h + 1)*Q, 'build'); px(cx, g - (sh.h + 1)*Q, 'build'); px(cx + Q, g - (sh.h + 1)*Q, 'build');
-      return;
-    }
-    if (p.kind === 'tree') {
-      const left = cx - ((sh.tw - 1) >> 1)*Q, trunkTop = sh.cy;
-      x.fillStyle = pal['agent-deep']; x.fillRect(left, trunkTop, sh.tw*Q, g - trunkTop);
-      // bark: darker seams once the trunk is thick enough to have them
-      if (sh.tw > 1) for (let y = trunkTop; y < g; y += Q) for (let i = 0; i < sh.tw; i++)
-        if (hash(p.seed, i, y) < .3) shade(left + i*Q, y, Q, Q, .35);
-      shade(left + (sh.tw - 1)*Q, trunkTop, Q, g - trunkTop, .2);
-      // roots flare out at the base of a big tree; a branch reaches out under the canopy
-      if (sh.tw === 3) { px(left - Q, g - Q, 'agent-deep'); px(left + 3*Q, g - Q, 'agent-deep'); }
-      if (v >= 8) {
-        const by = sh.cy + (sh.ry - 1)*Q, dir = p.side;
-        const bx = dir > 0 ? left + sh.tw*Q : left - Q;
-        px(bx, by, 'agent-deep'); px(bx + dir*Q, by - Q, 'agent-deep');
-      }
-      blob(cx, sh.cy, sh.rx, sh.ry, p.seed);
-      return;
-    }
-    if (p.kind === 'flower') {
+    if (k === 'tree') return drawTree(p, sh, v);
+    if (k === 'flower') {
       const top = g - sh.h*Q;
-      x.fillStyle = pal['build-deep']; x.fillRect(cx, top, Q, sh.h*Q);
+      rect(cx, top, Q, sh.h*Q, 'build-deep');
       px(cx + p.side*Q, g - (sh.h >> 1)*Q, 'build');
       if (v >= 4) px(cx - p.side*Q, g - ((sh.h >> 1) + 2)*Q, 'build');
       if (v < 3) { px(cx, top - Q, 'build'); return; }
@@ -534,15 +620,52 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       }
       return;
     }
-    if (p.kind === 'grass') {
-      const blades = v >= 3 ? [[-2, .5], [-1, .8], [0, 1], [1, .7], [2, .4]] : [[-1, .6], [0, 1], [1, .8]];
-      for (const [dx, f] of blades) {
-        const bh = Math.max(1, Math.round(sh.h*f));
-        x.fillStyle = pal[dx ? 'build' : 'build-deep']; x.fillRect(cx + dx*Q, g - bh*Q, Q, bh*Q);
+    if (k === 'sunflower') {
+      const top = g - sh.h*Q;
+      rect(cx, top, Q, sh.h*Q, 'build-deep');
+      for (let y = 3; y < sh.h - 1; y += 3) { px(cx - Q, g - y*Q, 'build'); px(cx + Q, g - (y + 1)*Q, 'build'); }
+      if (v < 4) { px(cx, top - Q, 'build'); px(cx - Q, top, 'build'); px(cx + Q, top, 'build'); return; }
+      // a ring of petals round a dark seed head that gets bigger at full size
+      const cy = top - (sh.r + 1)*Q + Q;
+      for (let dy = -sh.r; dy <= sh.r; dy++) for (let dx = -sh.r; dx <= sh.r; dx++) {
+        const e = Math.hypot(dx, dy);
+        if (e > sh.r + .3) continue;
+        px(cx + dx*Q, cy + dy*Q, e < sh.r - .7 ? 'agent-deep' : 'gold');
       }
       return;
     }
-    blob(cx, sh.cy, sh.rx, sh.ry, p.seed);
+    if (k === 'lavender') {
+      // three stalks, the flower spike creeping further down each as it grows
+      for (const [dx, f] of [[-1, .75], [0, 1], [1, .85]]) {
+        const h = Math.max(2, Math.round(sh.h*f)), spike = Math.min(h - 1, Math.round((v - 2)*1.3));
+        rect(cx + dx*Q, g - h*Q, Q, h*Q, 'build-deep');
+        for (let i = 0; i < spike; i++) px(cx + dx*Q, g - (h - i)*Q, i % 2 ? 'purple' : 'build-deep');
+        px(cx + dx*Q, g - (h + 1)*Q, 'purple');
+      }
+      return;
+    }
+    if (k === 'fern') {
+      // fronds arching out both ways from the middle, with leaflets along them
+      for (const dir of [-1, 1]) for (const [len, rise] of [[sh.l, .5], [Math.round(sh.l*.7), 1]]) {
+        for (let i = 0; i <= len; i++) {
+          const y = g - Math.round(1 + i*rise - (i*i)/(len*2.5))*Q, X = cx + dir*i*Q;
+          px(X, y, 'build-deep');
+          if (i > 0 && i < len && i % 2) px(X, y - Q, 'build');
+        }
+      }
+      rect(cx, g - (sh.l + 1)*Q, Q, (sh.l + 1)*Q, 'build-deep');
+      px(cx, g - (sh.l + 1)*Q, 'build');
+      return;
+    }
+    if (k === 'grass') {
+      const blades = v >= 3 ? [[-2, .5], [-1, .8], [0, 1], [1, .7], [2, .4]] : [[-1, .6], [0, 1], [1, .8]];
+      for (const [dx, f] of blades) {
+        const bh = Math.max(1, Math.round(sh.h*f));
+        rect(cx + dx*Q, g - bh*Q, Q, bh*Q, dx ? 'build' : 'build-deep');
+      }
+      return;
+    }
+    blob(cx, sh.cy, sh.rx, sh.ry, p.seed, 'build', 'build-deep');
     if (v >= 4) for (let i = 0; i < sh.rx; i++) {
       const dx = Math.round((hash(p.seed, i, 1)*2 - 1)*(sh.rx - 1)), dy = Math.round((hash(p.seed, i, 2)*2 - 1)*(sh.ry - 1)*.6);
       px(cx + dx*Q, sh.cy + dy*Q, 'agent');
@@ -556,11 +679,11 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       x.fillStyle = row[i] === 'O' ? pal.ink : pal.sky; x.fillRect(dx + i*2, dy + j*2, 2, 2);
     } });
   }
+  // trees at the back, the biggest first, small things in front
+  const ORDER = {tree: 0, sunflower: 1, bush: 2, fern: 3, lavender: 4, flower: 5, mushroom: 6, grass: 7};
   function draw() {
     x.clearRect(0, 0, W, H);
-    // trees at the back, the biggest first, small things in front
-    const order = {tree: 0, bush: 1, flower: 2, grass: 3};
-    plants.sort((a, b) => order[a.kind] - order[b.kind] || b.d - a.d).forEach(drawPlant);
+    plants.sort((a, b) => ORDER[a.kind] - ORDER[b.kind] || b.d - a.d).forEach(drawPlant);
     for (const d of drops) drawDrop(d.x|0, d.y|0);
     x.fillStyle = pal.sky;
     for (const s of splashes) { x.globalAlpha = s.life/14; x.fillRect(s.x|0, s.y|0, 2, 2); }
@@ -583,7 +706,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   // intro: each letter sheds a few drops as it lands
   document.querySelectorAll('#title .l').forEach((l, i) => setTimeout(() => {
     const b = l.getBoundingClientRect();
-    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 5);
+    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 8);
   }, i*70 + 200 + 450));
 
   const splash = (sx, sy) => { for (let k = 0; k < 4; k++) splashes.push({x: sx, y: sy, vx: (Math.random() - .5)*3, vy: -1.5 - Math.random()*1.5, life: 14}); };
@@ -604,7 +727,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       return false;
     });
     splashes = splashes.filter(s => { s.x += s.vx; s.y += s.vy; s.vy += .3; return --s.life > 0; });
-    for (const p of plants) if (p.d < p.s) p.d = Math.min(p.s, p.d + .1);
+    for (const p of plants) if (p.d < p.s) p.d = Math.min(p.s, p.d + .2);
     draw();
     if (drops.length || splashes.length || plants.some(p => p.d < p.s)) requestAnimationFrame(frame); else running = false;
   }
