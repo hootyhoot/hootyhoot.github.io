@@ -395,54 +395,185 @@ let li = 0;
 document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2003}`;
 
 // ---------- hero: the letters shed water drops, and plants grow where they land (clouds/stars/jets/birds come from sky.js) ----------
+// Every plant starts as the same two-leaf seedling. Each drop that lands on a
+// plant grows it a stage: a tree goes seedling -> sapling -> young tree ->
+// tree with bark -> big old tree; flowers, grass and bushes top out sooner.
+// Water on a fully grown plant seeds a new one nearby, so the ground keeps
+// getting denser as well as taller.
 (() => {
   const c = document.getElementById('hero-sky'), x = c.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const Q = 4;  // one plant pixel
+  const MAX = {tree: 14, flower: 6, grass: 4, bush: 6};
+  const WEIGHT = {tree: .25, flower: .4, grass: .2, bush: .15};
+  const petals = ['agent', 'amber', 'sky'];
   let pal;
   const loadPal = () => {
     pal = {};
-    for (const k of ['build', 'build-deep', 'agent', 'agent-deep', 'sky', 'amber']) pal[k] = cssVar('--' + k);
+    for (const k of ['build', 'build-deep', 'agent', 'agent-deep', 'sky', 'amber', 'ink']) pal[k] = cssVar('--' + k);
   };
   loadPal(); addEventListener('themechange', () => { loadPal(); if (reduce) draw(); else wake(); });
   let W, H, drops = [], splashes = [], plants = [], running = false;
   const groundY = () => H - 24 - 6;
+  const hash = (a, b, c) => { const v = Math.sin(a*12.9898 + b*78.233 + c*37.719)*43758.5453; return v - Math.floor(v); };
   // the loop only runs while something is falling, splashing or growing
   const wake = () => { if (!running && !reduce) { running = true; requestAnimationFrame(frame); } };
   function size() {
     W = c.width = c.offsetWidth; H = c.height = c.offsetHeight;
-    plants = plants.filter(p => (p.col + p.r + 1)*Q <= W);
+    plants = plants.filter(p => (p.col + 2)*Q <= W);
     reduce ? draw() : wake();
   }
   addEventListener('resize', size);
 
-  // kind: [chance, half-width in pixels, min height, max height]
-  const kinds = {flower: [.34, 1, 4, 9], tulip: [.22, 1, 3, 6], grass: [.22, 1, 2, 4], bush: [.14, 2, 2, 3], tree: [.08, 3, 6, 10]};
-  const petals = ['agent', 'amber', 'sky'];
   function pickKind() {
     let r = Math.random();
-    for (const k in kinds) { if ((r -= kinds[k][0]) < 0) return k; }
+    for (const k in WEIGHT) { if ((r -= WEIGHT[k]) < 0) return k; }
     return 'flower';
   }
-  // a new plant needs room; if the spot is taken it tries a few columns
-  // either side, and if there's none the drop just soaks in
-  function sprout(px) {
-    const kind = pickKind(), [, r, lo, hi] = kinds[kind];
-    const base = Math.round(px/Q), max = (W/Q|0) - r - 1;
-    for (const off of [0, 1, -1, 2, -2, 3, -3]) {
-      const col = base + off;
-      if (col < r || col > max) continue;
-      if (plants.some(p => Math.abs(p.col - col) <= p.r + r)) continue;
-      const h = lo + (Math.random()*(hi - lo + 1)|0);
-      plants.push({kind, col, r, max: h, h: reduce ? h : 0, t: 0,
-        petal: petals[Math.random()*petals.length|0], leaf: 1 + (Math.random()*(h - 2)|0), side: Math.random() < .5 ? -1 : 1});
-      return;
+  const free = col => col >= 2 && (col + 2)*Q <= W && !plants.some(p => Math.abs(p.col - col) < 3);
+  function sprout(col, kind) {
+    const p = {kind: kind || pickKind(), col, s: 1, d: reduce ? 1 : 0, seed: Math.random()*1000,
+      petal: petals[Math.random()*petals.length|0], tulip: Math.random() < .4, side: Math.random() < .5 ? -1 : 1};
+    plants.push(p);
+    return p;
+  }
+  // a grown plant drops a seed a little way off, usually of its own kind
+  function spread(p) {
+    for (let i = 0; i < 12; i++) {
+      const col = p.col + (Math.random() < .5 ? -1 : 1)*(3 + (Math.random()*9|0));
+      if (free(col)) { sprout(col, Math.random() < .6 ? p.kind : null); return; }
     }
   }
-  const spawn = (px, py, n) => {
+  function water(p) {
+    if (p.s < MAX[p.kind]) { p.s++; if (reduce) p.d = p.s; } else spread(p);
+  }
+  function landOnGround(px) {
+    const col = Math.round(px/Q);
+    if (free(col)) { sprout(col); return; }
+    let near = null;
+    for (const p of plants) if (!near || Math.abs(p.col - col) < Math.abs(near.col - col)) near = p;
+    if (near) water(near);
+  }
+
+  // shape of a plant at growth v (a float, so growth animates pixel by pixel)
+  function shape(p, v) {
+    const g = groundY();
+    if (v < 2) { const h = Math.max(1, Math.round(v + .4)); return {top: g - (h + 1)*Q, half: 1, h}; }
+    if (p.kind === 'tree') {
+      if (v < 4) { const h = Math.round(4 + (v - 2)*3); return {top: g - (h + 1)*Q, half: 1, h}; }
+      const th = Math.round(3 + (v - 4)*1.5), rx = Math.round(2 + (v - 4)*.8), ry = Math.round(rx*.8 + .5);
+      const tw = v < 7 ? 1 : v < 11 ? 2 : 3, cy = g - th*Q - Math.round(ry*.4)*Q;
+      return {top: cy - ry*Q, half: rx, th, rx, ry, tw, cy};
+    }
+    if (p.kind === 'flower') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 3)*Q, half: 1, h}; }
+    if (p.kind === 'grass') { const h = Math.round(1 + (v - 1)*1.2); return {top: g - h*Q, half: v >= 3 ? 2 : 1, h}; }
+    const rx = Math.round(1 + (v - 2)*.7), ry = Math.max(1, Math.round(rx*.7));
+    return {top: g - (2*ry + 1)*Q, half: rx, rx, ry, cy: g - (ry + 1)*Q};
+  }
+
+  const px = (cx, cy, color) => { x.fillStyle = pal[color]; x.fillRect(cx, cy, Q, Q); };
+  const shade = (cx, cy, w, h, a) => { x.fillStyle = `rgba(0,0,0,${a})`; x.fillRect(cx, cy, w, h); };
+  // a lumpy pixel blob, lit from the top left
+  function blob(cx, cy, rx, ry, seed) {
+    for (let dy = -ry; dy <= ry; dy++) for (let dx = -rx; dx <= rx; dx++) {
+      const e = (dx/(rx + .5))**2 + (dy/(ry + .5))**2;
+      if (e > 1 || (e > .7 && hash(seed, dx, dy) < .4)) continue;
+      const l = (dx + dy*1.3)/(rx + ry);
+      const X = cx + dx*Q, Y = cy + dy*Q;
+      px(X, Y, l < -.3 ? 'build' : 'build-deep');
+      if (l > .35) shade(X, Y, Q, Q, .3);
+      else if (l > -.3 && hash(seed, dy, dx) < .12) px(X, Y, 'build');
+    }
+  }
+  function drawPlant(p) {
+    const g = groundY(), cx = p.col*Q, v = p.d, sh = shape(p, v);
+    if (v < 2) {
+      // seedling: a short stem and two leaves
+      x.fillStyle = pal['build-deep']; x.fillRect(cx, g - sh.h*Q, Q, sh.h*Q);
+      px(cx - Q, g - (sh.h + 1)*Q, 'build'); px(cx + Q, g - (sh.h + 1)*Q, 'build');
+      return;
+    }
+    if (p.kind === 'tree' && v < 4) {
+      // sapling: a thin stem with leaves up alternate sides and a tuft on top
+      x.fillStyle = pal['agent-deep']; x.fillRect(cx, g - sh.h*Q, Q, sh.h*Q);
+      for (let y = 2; y < sh.h; y += 2) px(cx + (y % 4 ? -Q : Q), g - y*Q, 'build');
+      px(cx - Q, g - (sh.h + 1)*Q, 'build'); px(cx, g - (sh.h + 1)*Q, 'build'); px(cx + Q, g - (sh.h + 1)*Q, 'build');
+      return;
+    }
+    if (p.kind === 'tree') {
+      const left = cx - ((sh.tw - 1) >> 1)*Q, trunkTop = sh.cy;
+      x.fillStyle = pal['agent-deep']; x.fillRect(left, trunkTop, sh.tw*Q, g - trunkTop);
+      // bark: darker seams once the trunk is thick enough to have them
+      if (sh.tw > 1) for (let y = trunkTop; y < g; y += Q) for (let i = 0; i < sh.tw; i++)
+        if (hash(p.seed, i, y) < .3) shade(left + i*Q, y, Q, Q, .35);
+      shade(left + (sh.tw - 1)*Q, trunkTop, Q, g - trunkTop, .2);
+      // roots flare out at the base of a big tree; a branch reaches out under the canopy
+      if (sh.tw === 3) { px(left - Q, g - Q, 'agent-deep'); px(left + 3*Q, g - Q, 'agent-deep'); }
+      if (v >= 8) {
+        const by = sh.cy + (sh.ry - 1)*Q, dir = p.side;
+        const bx = dir > 0 ? left + sh.tw*Q : left - Q;
+        px(bx, by, 'agent-deep'); px(bx + dir*Q, by - Q, 'agent-deep');
+      }
+      blob(cx, sh.cy, sh.rx, sh.ry, p.seed);
+      return;
+    }
+    if (p.kind === 'flower') {
+      const top = g - sh.h*Q;
+      x.fillStyle = pal['build-deep']; x.fillRect(cx, top, Q, sh.h*Q);
+      px(cx + p.side*Q, g - (sh.h >> 1)*Q, 'build');
+      if (v >= 4) px(cx - p.side*Q, g - ((sh.h >> 1) + 2)*Q, 'build');
+      if (v < 3) { px(cx, top - Q, 'build'); return; }
+      if (v < 4) { px(cx, top - Q, p.petal); return; }  // bud
+      if (p.tulip) {
+        for (let dx = -1; dx <= 1; dx++) { px(cx + dx*Q, top - Q, p.petal); px(cx + dx*Q, top - 2*Q, p.petal); }
+        px(cx - Q, top - 3*Q, p.petal); px(cx + Q, top - 3*Q, p.petal);
+      } else {
+        for (const [dx, dy] of [[-1, -2], [1, -2], [0, -3], [0, -1]]) px(cx + dx*Q, top + dy*Q, p.petal);
+        px(cx, top - 2*Q, p.petal === 'amber' ? 'agent' : 'amber');
+      }
+      return;
+    }
+    if (p.kind === 'grass') {
+      const blades = v >= 3 ? [[-2, .5], [-1, .8], [0, 1], [1, .7], [2, .4]] : [[-1, .6], [0, 1], [1, .8]];
+      for (const [dx, f] of blades) {
+        const bh = Math.max(1, Math.round(sh.h*f));
+        x.fillStyle = pal[dx ? 'build' : 'build-deep']; x.fillRect(cx + dx*Q, g - bh*Q, Q, bh*Q);
+      }
+      return;
+    }
+    blob(cx, sh.cy, sh.rx, sh.ry, p.seed);
+    if (v >= 4) for (let i = 0; i < sh.rx; i++) {
+      const dx = Math.round((hash(p.seed, i, 1)*2 - 1)*(sh.rx - 1)), dy = Math.round((hash(p.seed, i, 2)*2 - 1)*(sh.ry - 1)*.6);
+      px(cx + dx*Q, sh.cy + dy*Q, 'agent');
+    }
+  }
+
+  // a teardrop, drawn in 2px pixels with a glint
+  const DROP = ['..X..', '.XXX.', 'XXXXX', 'XOXXX', '.XXX.'];
+  function drawDrop(dx, dy) {
+    DROP.forEach((row, j) => { for (let i = 0; i < 5; i++) if (row[i] !== '.') {
+      x.fillStyle = row[i] === 'O' ? pal.ink : pal.sky; x.fillRect(dx + i*2, dy + j*2, 2, 2);
+    } });
+  }
+  function draw() {
+    x.clearRect(0, 0, W, H);
+    // trees at the back, the biggest first, small things in front
+    const order = {tree: 0, bush: 1, flower: 2, grass: 3};
+    plants.sort((a, b) => order[a.kind] - order[b.kind] || b.d - a.d).forEach(drawPlant);
+    for (const d of drops) drawDrop(d.x|0, d.y|0);
+    x.fillStyle = pal.sky;
+    for (const s of splashes) { x.globalAlpha = s.life/14; x.fillRect(s.x|0, s.y|0, 2, 2); }
+    x.globalAlpha = 1;
+  }
+
+  const spawn = (px0, py, n) => {
+    const g = groundY();
     for (let k = 0; k < n; k++) {
-      if (reduce) { sprout(px + (Math.random() - .5)*120); continue; }
-      drops.push({x: px, y: py, vx: (Math.random() - .5)*10, vy: -3 - Math.random()*6});
+      // most drops are thrown anywhere along the ground, some land near the letter
+      const target = Math.random() < .7 ? 8 + Math.random()*(W - 24) : Math.max(8, Math.min(W - 16, px0 + (Math.random() - .5)*300));
+      if (reduce) { landOnGround(target); continue; }
+      const vy = -3 - Math.random()*4, t = (-vy + Math.sqrt(vy*vy + 1.2*(g - py)))/.6;
+      drops.push({x: px0 - 5, y: py, vx: (target - px0)/t, vy});
     }
     reduce ? draw() : wake();
   };
@@ -454,70 +585,27 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 3);
   }, i*70 + 200 + 450));
 
-  const px = (cx, cy, color) => { x.fillStyle = pal[color]; x.fillRect(cx, cy, Q, Q); };
-  function drawPlant(p) {
-    const g = groundY(), cx = p.col*Q, top = g - p.h*Q, done = p.h >= p.max;
-    if (p.kind === 'grass') {
-      [[-1, .6], [0, 1], [1, .8]].forEach(([dx, f]) => {
-        const bh = Math.max(1, Math.round(p.h*f));
-        x.fillStyle = pal.build; x.fillRect(cx + dx*Q, g - bh*Q, Q, bh*Q);
-      });
-      return;
-    }
-    if (p.kind === 'bush') {
-      for (let row = 0; row < p.h; row++) {
-        const w = done && row === p.h - 1 ? 1 : 2;
-        x.fillStyle = pal[row === p.h - 1 ? 'build' : 'build-deep'];
-        x.fillRect(cx - w*Q, g - (row + 1)*Q, (2*w + 1)*Q, Q);
-      }
-      if (done) { px(cx - Q, g - 2*Q, 'agent'); px(cx + Q*2, g - Q, 'agent'); }
-      return;
-    }
-    // flower, tulip and tree all start with a stem (a trunk for the tree)
-    x.fillStyle = pal[p.kind === 'tree' ? 'agent-deep' : 'build-deep'];
-    x.fillRect(cx, top, Q, p.h*Q);
-    if (p.kind !== 'tree' && p.h > p.leaf) px(cx + p.side*Q, g - (p.leaf + 1)*Q, 'build');
-    if (!done) return;
-    if (p.kind === 'flower') {
-      for (const [dx, dy] of [[-1, -2], [1, -2], [0, -3], [0, -1]]) px(cx + dx*Q, top + dy*Q, p.petal);
-      px(cx, top - 2*Q, p.petal === 'amber' ? 'agent' : 'amber');
-    } else if (p.kind === 'tulip') {
-      for (let dx = -1; dx <= 1; dx++) { px(cx + dx*Q, top - Q, p.petal); px(cx + dx*Q, top - 2*Q, p.petal); }
-      px(cx - Q, top - 3*Q, p.petal); px(cx + Q, top - 3*Q, p.petal);
-    } else {
-      // canopy, widest in the middle, lit from the top left
-      [2, 3, 3, 2, 1].forEach((w, i) => {
-        const y = top - (i + 1)*Q + 2*Q;
-        x.fillStyle = pal['build-deep']; x.fillRect(cx - w*Q, y, (2*w + 1)*Q, Q);
-        if (i > 1) { x.fillStyle = pal.build; x.fillRect(cx - w*Q, y, (w + 1)*Q, Q); }
-      });
-    }
-  }
-  function draw() {
-    x.clearRect(0, 0, W, H);
-    plants.forEach(drawPlant);
-    x.fillStyle = pal.sky;
-    for (const d of drops) { x.fillRect(d.x|0, d.y|0, Q, Q*2); x.fillRect((d.x|0), (d.y|0) - Q, Q, Q); }
-    for (const s of splashes) { x.globalAlpha = s.life/14; x.fillRect(s.x|0, s.y|0, 2, 2); }
-    x.globalAlpha = 1;
-  }
+  const splash = (sx, sy) => { for (let k = 0; k < 4; k++) splashes.push({x: sx, y: sy, vx: (Math.random() - .5)*3, vy: -1.5 - Math.random()*1.5, life: 14}); };
   function frame() {
     const g = groundY();
-    let busy = false;
     drops = drops.filter(d => {
-      d.vy += .6; d.x += d.vx; d.y += d.vy; d.vx *= .98;
-      if (d.x < 0 || d.x > W - Q) { d.vx *= -1; d.x = Math.max(0, Math.min(W - Q, d.x)); }
-      if (d.y + Q*2 < g) return true;
-      for (let k = 0; k < 3; k++) splashes.push({x: d.x, y: g - 2, vx: (Math.random() - .5)*3, vy: -1.5 - Math.random()*1.5, life: 14});
-      sprout(d.x);
+      d.vy += .6; d.x += d.vx; d.y += d.vy;
+      const mid = d.x + 5, bottom = d.y + 10;
+      // a drop that reaches a plant waters it; the tallest one under it catches it
+      let hit = null, hitTop = Infinity;
+      for (const p of plants) {
+        const sh = shape(p, p.d);
+        if (Math.abs(mid - (p.col*Q + Q/2)) <= (sh.half + .5)*Q && bottom >= sh.top && sh.top < hitTop) { hit = p; hitTop = sh.top; }
+      }
+      if (hit) { water(hit); splash(mid, hitTop); return false; }
+      if (bottom < g) return true;
+      landOnGround(mid); splash(mid, g - 2);
       return false;
     });
     splashes = splashes.filter(s => { s.x += s.vx; s.y += s.vy; s.vy += .3; return --s.life > 0; });
-    // plants grow a pixel every few frames; the flower/canopy opens at full height
-    for (const p of plants) if (p.h < p.max && ++p.t % 5 === 0) p.h++;
-    busy = drops.length || splashes.length || plants.some(p => p.h < p.max);
+    for (const p of plants) if (p.d < p.s) p.d = Math.min(p.s, p.d + .04);
     draw();
-    if (busy) requestAnimationFrame(frame); else running = false;
+    if (drops.length || splashes.length || plants.some(p => p.d < p.s)) requestAnimationFrame(frame); else running = false;
   }
 })();
 
