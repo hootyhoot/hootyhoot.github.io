@@ -489,7 +489,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       return {top: cy - ry*Q, half: rx, th, rx, ry, tw, cy};
     }
     if (k === 'flower') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 3)*Q, half: 1, h}; }
-    if (k === 'sunflower') { const h = Math.round(4 + (v - 2)*3), r = v >= 6 ? 3 : 2; return {top: g - (h + r + 1)*Q, half: r, h, r}; }
+    if (k === 'sunflower') { const h = Math.round(3 + (v - 2)*1.6), r = v >= 6 ? 3 : 2; return {top: g - (h + r + 1)*Q, half: r, h, r}; }
     if (k === 'lavender') { const h = Math.round(3 + (v - 2)*2); return {top: g - (h + 1)*Q, half: 2, h}; }
     if (k === 'fern') { const l = Math.round(2 + (v - 2)*1.4); return {top: g - (l + 1)*Q, half: l, l}; }
     if (k === 'grass') { const h = Math.round(1 + (v - 1)*1.2); return {top: g - h*Q, half: v >= 3 ? 2 : 1, h}; }
