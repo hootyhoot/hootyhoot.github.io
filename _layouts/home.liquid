@@ -511,7 +511,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       else if (hash(seed, dy, dx) < .12) px(X, Y, fleck || lit);
     }
   }
-  const CANOPY = {oak: ['build', 'build-deep'], birch: ['build', 'build-deep', 'gold'], cherry: ['pink', 'pink-deep', 'ink'], maple: ['amber', 'rust', 'agent']};
+  const CANOPY = {oak: ['build', 'build-deep'], birch: ['build', 'build-deep', 'gold'], cherry: ['pink', 'pink-deep', 'ink'], maple: ['agent', 'rust', 'amber']};
 
   function drawTree(p, sh, v) {
     const g = groundY(), cx = p.col*Q, sp = p.species;
@@ -554,10 +554,11 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     if (sp === 'palm') {
       // a trunk that leans as it rises, ringed every couple of pixels, fronds drooping off the top
       let tx = cx;
+      const tw = v >= 9 ? 2 : 1;
       for (let r = 0; r < sh.th; r++) {
-        if (r && r % 5 === 0) tx += p.side*Q;
-        rect(tx, g - (r + 1)*Q, Q, Q, 'agent-deep');
-        if (r % 2) shade(tx, g - (r + 1)*Q, Q, Q, .3);
+        if (r > 3 && r % 8 === 0) tx += p.side*Q;
+        rect(tx, g - (r + 1)*Q, tw*Q, Q, 'agent-deep');
+        if (r % 2) shade(tx, g - (r + 1)*Q, tw*Q, Q, .3);
       }
       const ty = g - (sh.th + 1)*Q;
       for (const dir of [-1, 1]) for (const lift of [1, 0]) for (let i = 1; i <= sh.fl; i++) {
