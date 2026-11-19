@@ -479,8 +479,8 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
         return {top: g - (th + ch)*Q, half: w, th, ch, w, tiers: 2 + Math.floor(u/3)};
       }
       if (sp === 'palm') {
-        const th = Math.round(5 + u*2.3), fl = Math.round(2 + u*.5);
-        return {top: g - (th + 2)*Q, half: fl + 1, th, fl};
+        const th = Math.round(5 + u*2.3), fl = Math.round(3 + u*.6);
+        return {top: g - (th + 2 + Math.round((fl + 1)*.6))*Q, half: fl + 1, th, fl};
       }
       let th = Math.round(3 + u*1.5), rx = Math.round(2 + u*.8), ry = Math.round(rx*.8 + .5);
       if (sp === 'birch') { th = Math.round(th*1.2); rx = Math.max(2, Math.round(rx*.65)); ry = Math.round(ry*1.3); }
@@ -560,13 +560,29 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
         rect(tx, g - (r + 1)*Q, tw*Q, Q, 'agent-deep');
         if (r % 2) shade(tx, g - (r + 1)*Q, tw*Q, Q, .3);
       }
-      const ty = g - (sh.th + 1)*Q;
-      for (const dir of [-1, 1]) for (const lift of [1, 0]) for (let i = 1; i <= sh.fl; i++) {
-        const droop = Math.floor(i*i/(sh.fl + 1)) - lift;
-        px(tx + dir*i*Q, ty + droop*Q, lift ? 'build' : 'build-deep');
+      // a star of five broad fronds pointing out from the crown: one up, two
+      // angled up, two out to the sides with their tips dipping. Each is a
+      // solid leaf, narrow at the crown, broad in the middle, pointed at the
+      // tip, lit on its upper side and dark underneath.
+      const ty = g - (sh.th + 1)*Q, L = sh.fl + 1, cells = new Map();
+      for (const [vx, vy, grav, len] of [[0, -1, 0, L*.75], [-.72, -.7, .04, L*.9], [.72, -.7, .04, L*.9], [-1, .1, .07, L], [1, .1, .07, L]]) {
+        for (let i = 0; i <= len; i += .25) {
+          const fx = vx*i, fy = vy*i + grav*i*i/2, dx = vx, dy = vy + grav*i, m = Math.hypot(dx, dy);
+          // the side of the spine that faces up is the lit one
+          let nx = -dy/m, ny = dx/m;
+          if (ny > 0) { nx = -nx; ny = -ny; }
+          const w = .3 + 1.5*Math.pow(Math.sin(Math.PI*Math.min(1, i/len + .08)), .8);
+          for (let oy = -2; oy <= 2; oy++) for (let ox = -2; ox <= 2; ox++) {
+            if (Math.hypot(ox, oy) > w) continue;
+            const key = Math.round(fx + ox) + ',' + Math.round(fy + oy);
+            const lit = ox*nx + oy*ny >= 0;
+            if (!cells.has(key) || lit) cells.set(key, lit ? 'build' : 'build-deep');
+          }
+        }
       }
-      px(tx, ty - Q, 'build');
-      if (v >= 8) { px(tx - Q, ty + Q, 'agent'); px(tx + Q, ty + Q, 'agent'); shade(tx + Q, ty + Q, Q, Q, .3); }
+      for (const [key, color] of cells) { const [cx2, cy2] = key.split(',').map(Number); px(tx + cx2*Q, ty + cy2*Q, color); }
+      px(tx, ty, 'build-deep');
+      if (v >= 8) { px(tx - Q, ty + Q, 'agent-deep'); px(tx + Q, ty + Q, 'agent-deep'); px(tx, ty + 2*Q, 'agent-deep'); }
       return;
     }
     const left = cx - ((sh.tw - 1) >> 1)*Q, trunkTop = sh.cy, birch = sp === 'birch';
