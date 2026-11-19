@@ -511,7 +511,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       else if (hash(seed, dy, dx) < .12) px(X, Y, fleck || lit);
     }
   }
-  const CANOPY = {oak: ['build', 'build-deep'], birch: ['build', 'build-deep', 'gold'], cherry: ['pink', 'pink-deep', 'ink'], maple: ['agent', 'rust', 'amber']};
+  const CANOPY = {oak: ['build', 'build-deep'], birch: ['build', 'build-deep', 'gold'], cherry: ['pink', 'pink-deep', 'birch'], maple: ['agent', 'rust', 'amber']};
 
   function drawTree(p, sh, v) {
     const g = groundY(), cx = p.col*Q, sp = p.species;
