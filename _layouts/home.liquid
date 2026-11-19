@@ -440,8 +440,9 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     return 'flower';
   }
   const free = col => col >= 2 && (col + 2)*Q <= W && !plants.some(p => Math.abs(p.col - col) < 3);
-  function sprout(col, kind, species) {
-    plants.push({kind: kind || pickKind(), species: species || pick(SPECIES), col, s: 1, d: reduce ? 1 : 0,
+  function sprout(col, kind, species, boost = 1) {
+    const s0 = Math.min(MAX[kind] || 4, 1 + STAGES_PER_DROP*(boost - 1));
+    plants.push({kind: kind || pickKind(), species: species || pick(SPECIES), col, s: s0, d: reduce ? s0 : 0,
       seed: Math.random()*1000, petal: pick(petals), tulip: Math.random() < .4, side: Math.random() < .5 ? -1 : 1});
   }
   // a grown plant drops a seed a little way off, usually of its own kind
@@ -451,15 +452,16 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       if (free(col)) { Math.random() < .6 ? sprout(col, p.kind, p.species) : sprout(col); return; }
     }
   }
-  function water(p) {
-    if (p.s < MAX[p.kind]) { p.s = Math.min(MAX[p.kind], p.s + STAGES_PER_DROP); if (reduce) p.d = p.s; } else spread(p);
+  // boost: how many drops' worth of growth this drop carries
+  function water(p, boost = 1) {
+    if (p.s < MAX[p.kind]) { p.s = Math.min(MAX[p.kind], p.s + STAGES_PER_DROP*boost); if (reduce) p.d = p.s; } else spread(p);
   }
-  function landOnGround(px) {
+  function landOnGround(px, boost) {
     const col = Math.round(px/Q);
-    if (free(col)) { sprout(col); return; }
+    if (free(col)) { const kind = pickKind(); sprout(col, kind, null, boost); return; }
     let near = null;
     for (const p of plants) if (!near || Math.abs(p.col - col) < Math.abs(near.col - col)) near = p;
-    if (near) water(near);
+    if (near) water(near, boost);
   }
 
   // Size of a plant at growth v (a float, so growth animates pixel by pixel):
@@ -707,23 +709,24 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     x.globalAlpha = 1;
   }
 
-  const spawn = (px0, py, n) => {
+  const spawn = (px0, py, n, boost = 1) => {
     const g = groundY();
     for (let k = 0; k < n; k++) {
       // most drops are thrown anywhere along the ground, some land near the letter
       const target = Math.random() < .7 ? 8 + Math.random()*(W - 24) : Math.max(8, Math.min(W - 16, px0 + (Math.random() - .5)*300));
-      if (reduce) { landOnGround(target); continue; }
+      if (reduce) { landOnGround(target, boost); continue; }
       const vy = -3 - Math.random()*4, t = (-vy + Math.sqrt(vy*vy + 1.2*(g - py)))/.6;
-      drops.push({x: px0 - 5, y: py, vx: (target - px0)/t, vy});
+      drops.push({x: px0 - 5, y: py, vx: (target - px0)/t, vy, boost});
     }
     reduce ? draw() : wake();
   };
-  window.spawnDrops = (cx, cy, n) => { const r = c.getBoundingClientRect(); spawn(cx - r.left, cy - r.top, n); };
+  window.spawnDrops = (cx, cy, n, boost) => { const r = c.getBoundingClientRect(); spawn(cx - r.left, cy - r.top, n, boost); };
   size();
-  // intro: each letter sheds a few drops as it lands
+  // intro: each letter sheds a few drops as it lands; these grow plants
+  // twice as fast, so the ground isn't bare on first load
   document.querySelectorAll('#title .l').forEach((l, i) => setTimeout(() => {
     const b = l.getBoundingClientRect();
-    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 8);
+    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 8, 2);
   }, i*70 + 200 + 450));
 
   const splash = (sx, sy) => { for (let k = 0; k < 4; k++) splashes.push({x: sx, y: sy, vx: (Math.random() - .5)*3, vy: -1.5 - Math.random()*1.5, life: 14}); };
@@ -738,9 +741,9 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
         const sh = shape(p, p.d);
         if (Math.abs(mid - (p.col*Q + Q/2)) <= (sh.half + .5)*Q && bottom >= sh.top && sh.top < hitTop) { hit = p; hitTop = sh.top; }
       }
-      if (hit) { water(hit); splash(mid, hitTop); return false; }
+      if (hit) { water(hit, d.boost); splash(mid, hitTop); return false; }
       if (bottom < g) return true;
-      landOnGround(mid); splash(mid, g - 2);
+      landOnGround(mid, d.boost); splash(mid, g - 2);
       return false;
     });
     splashes = splashes.filter(s => { s.x += s.vx; s.y += s.vy; s.vy += .3; return --s.life > 0; });
