@@ -378,7 +378,7 @@ let li = 0;
     inner.addEventListener('click', () => {
       inner.classList.remove('kick'); void inner.offsetWidth; inner.classList.add('kick');
       const r = inner.getBoundingClientRect();
-      if (window.spawnDrops) window.spawnDrops(r.left + r.width/2, r.top + r.height/2, 6);
+      if (window.spawnDrops) window.spawnDrops(r.left + r.width/2, r.top + r.height/2, 10);
     });
     inner.addEventListener('animationend', () => inner.classList.remove('kick'));
     // Hover is tracked on the outer span, which doesn't lift, so the letter
@@ -445,7 +445,8 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
     }
   }
   function water(p) {
-    if (p.s < MAX[p.kind]) { p.s++; if (reduce) p.d = p.s; } else spread(p);
+    // two stages per drop, so a few clicks show a tree going through its forms
+    if (p.s < MAX[p.kind]) { p.s = Math.min(MAX[p.kind], p.s + 2); if (reduce) p.d = p.s; } else spread(p);
   }
   function landOnGround(px) {
     const col = Math.round(px/Q);
@@ -582,7 +583,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
   // intro: each letter sheds a few drops as it lands
   document.querySelectorAll('#title .l').forEach((l, i) => setTimeout(() => {
     const b = l.getBoundingClientRect();
-    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 3);
+    window.spawnDrops(b.left + b.width/2, b.bottom - b.height*.2, 5);
   }, i*70 + 200 + 450));
 
   const splash = (sx, sy) => { for (let k = 0; k < 4; k++) splashes.push({x: sx, y: sy, vx: (Math.random() - .5)*3, vy: -1.5 - Math.random()*1.5, life: 14}); };
@@ -603,7 +604,7 @@ document.getElementById('lvl').textContent = `Lvl ${new Date().getFullYear() - 2
       return false;
     });
     splashes = splashes.filter(s => { s.x += s.vx; s.y += s.vy; s.vy += .3; return --s.life > 0; });
-    for (const p of plants) if (p.d < p.s) p.d = Math.min(p.s, p.d + .04);
+    for (const p of plants) if (p.d < p.s) p.d = Math.min(p.s, p.d + .1);
     draw();
     if (drops.length || splashes.length || plants.some(p => p.d < p.s)) requestAnimationFrame(frame); else running = false;
   }
