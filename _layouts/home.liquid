@@ -91,8 +91,9 @@ header nav a:hover{color:var(--build)}
 /* outer span: drop in, then bob forever in a wave; inner span: hover/click effects */
 /* per-letter delays are set inline from JS (drop, then bob) */
 .hero h1 .l{display:inline-block;opacity:0;animation:drop .5s steps(6) forwards,bob 1.8s steps(6) infinite}
-.hero h1 .l i{display:inline-block;font-style:normal;cursor:pointer;transition:transform .1s steps(2),color .1s steps(2)}
-.hero h1 .l i:hover{transform:translateY(-14px);color:var(--build)}
+/* .up is set from JS and held briefly after the pointer leaves, so a quick swipe still lifts every letter it crosses */
+.hero h1 .l i{display:inline-block;font-style:normal;cursor:pointer;transition:transform .1s steps(2,jump-start),color .1s steps(2,jump-start)}
+.hero h1 .l i.up{transform:translateY(-14px);color:var(--build)}
 .hero h1 .l i.kick{animation:kick .6s steps(8)}
 @keyframes drop{from{opacity:0;transform:translateY(-120px)}to{opacity:1;transform:none}}
 @keyframes bob{0%,100%{opacity:1;transform:translateY(0)}50%{opacity:1;transform:translateY(-10px)}}
@@ -380,6 +381,11 @@ let li = 0;
       if (window.spawnBlocks) window.spawnBlocks(r.left + r.width/2, r.top + r.height/2, 10);
     });
     inner.addEventListener('animationend', () => inner.classList.remove('kick'));
+    // Hover is tracked on the outer span, which doesn't lift, so the letter
+    // rising out from under the pointer doesn't end the hover early.
+    let drop;
+    l.addEventListener('pointerenter', () => { clearTimeout(drop); inner.classList.add('up'); });
+    l.addEventListener('pointerleave', () => { drop = setTimeout(() => inner.classList.remove('up'), 160); });
     l.appendChild(inner);
     w.appendChild(l);
   }
